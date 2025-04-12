@@ -5,7 +5,7 @@ import { Search, ShoppingCart } from "lucide-react";
 const navItems = [
     { name: "Home", href: "#" },
     { name: "Products", href: "#" },
-    { name: "Contact", href: "#" },
+    { name: "Contact", href: "/ContactPage" },
 ];
 
 const Navbar = () => {

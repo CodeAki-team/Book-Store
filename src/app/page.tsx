@@ -3,5 +3,6 @@ import Footer from "../components/Footer/Footer"; // Adjust the path as needed
 export default function Home() {
   
   return(<> <Navbar />
-   <Footer /> </>)
+   <Footer />
+  </>)
 }
