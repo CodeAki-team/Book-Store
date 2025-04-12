@@ -1,6 +1,4 @@
 'use client';
-import Navbar from "../../components/Header/Navbar";
-import Footer from "../../components/Footer/Footer";
 import React, { useState } from 'react';
 import { Mail, Phone, MapPin } from 'lucide-react';
 import { supabase } from '@/lib/supabaseClient';
@@ -23,12 +21,12 @@ const ContactPage: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
-        setErrorMessage(''); 
+        setErrorMessage('');
 
         try {
             // Insert data into Supabase table
             const { data, error } = await supabase
-                .from('contact_form_submissions') 
+                .from('contact_form_submissions')
                 .insert([
                     {
                         name: form.name,
@@ -37,7 +35,6 @@ const ContactPage: React.FC = () => {
                     },
                 ]);
             if (error) {
-                
                 console.error('Error submitting form:', error);
                 setErrorMessage(error.message || 'An unexpected error occurred.');
                 throw new Error(error.message || 'Unknown error');
@@ -45,13 +42,13 @@ const ContactPage: React.FC = () => {
 
             console.log('Form submitted:', data);
             setSuccess(true);
-            setForm({ name: '', email: '', message: '' }); 
+            setForm({ name: '', email: '', message: '' });
         } catch (error) {
             if (error instanceof Error) {
-                console.error('Error submitting form:', error.message); 
-                setErrorMessage(error.message); 
+                console.error('Error submitting form:', error.message);
+                setErrorMessage(error.message);
             } else {
-                console.error('Unknown error submitting form:', error); 
+                console.error('Unknown error submitting form:', error);
                 setErrorMessage('An unexpected error occurred.');
             }
         } finally {
@@ -61,7 +58,6 @@ const ContactPage: React.FC = () => {
 
     return (
         <>
-            <Navbar />
             <section className="min-h-screen bg-white text-gray-800 py-16 px-4 sm:px-8 lg:px-24">
                 <div className="max-w-5xl mx-auto">
                     <h1 className="text-4xl font-bold text-blue-600 mb-4 text-center">Contact Us</h1>
@@ -81,7 +77,7 @@ const ContactPage: React.FC = () => {
                         </div>
                     )}
 
-                    <div className="grid gap-12 sm:grid-cols-1 md:grid-cols-2 mb-12">
+                    <div className="grid gap-12 md:grid-cols-2 mb-12">
                         {/* Contact Info Section */}
                         <div className="space-y-8">
                             <div className="flex items-start gap-4">
@@ -110,7 +106,7 @@ const ContactPage: React.FC = () => {
                         {/* Contact Form Section */}
                         <form
                             onSubmit={handleSubmit}
-                            className="bg-white shadow-md rounded-lg p-6 sm:p-8 border border-blue-100"
+                            className="bg-white shadow-md rounded-lg p-6 sm:p-8 border border-blue-300 w-full"
                         >
                             <div className="mb-6">
                                 <label htmlFor="name" className="block text-sm font-semibold mb-2 text-blue-700">
@@ -171,7 +167,6 @@ const ContactPage: React.FC = () => {
                     </div>
                 </div>
             </section>
-            <Footer />
         </>
     );
 };
