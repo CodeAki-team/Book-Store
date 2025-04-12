@@ -5,7 +5,7 @@ import { Search, ShoppingCart } from "lucide-react";
 const navItems = [
     { name: "Home", href: "#" },
     { name: "Products", href: "#" },
-    { name: "Contact", href: "/ContactPage" },
+    { name: "Contact", href: "/contactpage" },
 ];
 
 const Navbar = () => {
@@ -31,21 +31,21 @@ const Navbar = () => {
 
                         {/* Store Name */}
                         <span className="text-3xl font-extrabold text-gray-800 font-[Poppins, sans-serif]">
-              INKSPIRE
-            </span>
+                            INKSPIRE
+                        </span>
                     </div>
 
                     {/* Mobile Menu Button */}
                     <button
                         onClick={() => setIsMenuOpen(!isMenuOpen)}
-                        className="md:hidden text-gray-600 hover:text-blue-600 transition-all"
+                        className="md:hidden text-gray-600 hover:text-blue-600 transition-all duration-700 ease-in-out transform hover:scale-105"
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             fill="none"
                             viewBox="0 0 24 24"
                             stroke="currentColor"
-                            className="w-8 h-8"
+                            className={`w-8 h-8 transform transition-all duration-700 ease-in-out ${isMenuOpen ? 'rotate-45' : ''}`}
                         >
                             <path
                                 strokeLinecap="round"
@@ -86,9 +86,13 @@ const Navbar = () => {
                             <Search size={28} />
                         </button>
 
-                        <button className="text-white bg-blue-600 hover:bg-blue-700 transition-all py-2 px-4 rounded-md text-lg cursor-pointer">
+                        {/* Sign Up Button */}
+                        <a
+                            href="/signup"
+                            className="text-white bg-blue-600 hover:bg-blue-700 transition-all py-2 px-4 rounded-md text-lg cursor-pointer"
+                        >
                             Sign Up
-                        </button>
+                        </a>
                     </div>
                 </div>
 
@@ -102,7 +106,7 @@ const Navbar = () => {
                         <a
                             key={item.name}
                             href={item.href}
-                            className="text-gray-700 hover:text-blue-600 transition-all"
+                            className="text-gray-700 hover:text-blue-600 transition-all duration-700 ease-in-out transform hover:scale-105"
                         >
                             {item.name}
                         </a>
@@ -122,10 +126,13 @@ const Navbar = () => {
                         <Search size={28} />
                     </button>
 
-                    {/* Sign Up Button */}
-                    <button className="text-white bg-blue-600 hover:bg-blue-700 transition-all py-2 px-4 rounded-md text-lg cursor-pointer">
+                    {/* Sign Up Button in Mobile Menu */}
+                    <a
+                        href="/signup"
+                        className="text-white bg-blue-600 hover:bg-blue-700 transition-all py-2 px-4 rounded-md text-lg cursor-pointer"
+                    >
                         Sign Up
-                    </button>
+                    </a>
                 </div>
             </header>
         </>
