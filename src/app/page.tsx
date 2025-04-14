@@ -1,18 +1,54 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Image from "next/image";
-import bannerImg from "/public/banner1.jpg"; // Replace with your actual image path
+import Link from "next/link";
+import img1 from "../assets/HeroImage1.jpg";
+import img2 from "../assets/HeroImage2.jpg";
+import img3 from "../assets/HeroImage3.jpg";
+
+const images = [img1, img2, img3];
 
 export default function Home() {
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
+        }, 8000); 
+
+        return () => clearInterval(interval);
+    }, []);
+
+    const goToPrevious = () => {
+        setCurrentImageIndex((prevIndex) =>
+            prevIndex === 0 ? images.length - 1 : prevIndex - 1
+        );
+    };
+
+    const goToNext = () => {
+        setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
+    };
+
     return (
-        <main className="min-h-screen flex items-center justify-center bg-gray-100">
-            <section className="relative w-full max-w-7xl mx-auto flex flex-col md:flex-row bg-white shadow-lg overflow-hidden rounded-2xl">
+        <main className="min-h-[85vh] flex items-start justify-center pt-8 bg-gray-100">
+            <section className="relative w-full max-w-7xl mx-auto flex flex-col md:flex-row bg-white shadow-xl overflow-hidden rounded-2xl">
                 {/* Left Text Section */}
-                <div className="w-full md:w-1/2 p-10 flex flex-col justify-center bg-white z-10 relative">
-                    <h1 className="text-5xl font-bold text-gray-900 mb-6">Welcome to <span className="text-blue-600">INKSPIRE</span></h1>
-                    <p className="text-gray-700 text-lg">
+                <div className="w-full md:w-1/2 p-12 flex flex-col justify-center bg-white z-10 relative">
+                    <h1 className="text-5xl font-extrabold text-gray-900 mb-6 leading-tight">
+                        Welcome to <span className="text-blue-600">INKSPIRE</span>
+                    </h1>
+                    <p className="text-gray-700 text-xl mb-6">
                         Dive into a world of stories. INKSPIRE is your go-to online bookstore, offering a curated collection for every reader.
                     </p>
+                    <div className="flex justify-center mt-4">
+                        <Link
+                            href="/products"
+                            className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-300 w-max"
+                        >
+                            View Products
+                        </Link>
+                    </div>
                 </div>
 
                 {/* Divider Shape */}
@@ -23,16 +59,33 @@ export default function Home() {
                 </div>
 
                 {/* Right Image Section */}
-                <div className="w-full md:w-1/2 relative">
+                <div className="w-full md:w-1/2 relative h-[400px]">
                     <Image
-                        src={bannerImg}
-                        alt="Bookstore Banner"
-                        layout="responsive"
-                        width={600}
-                        height={400}
-                        className="object-cover h-full w-full"
+                        src={images[currentImageIndex]}
+                        alt={`Slide ${currentImageIndex + 1}`}
+                        fill
+                        className="object-cover transition-opacity duration-[2000ms] ease-in-out rounded-r-2xl"
                         priority
                     />
+
+                    {/* Navigation Buttons */}
+                    <button
+                        onClick={goToPrevious}
+                        className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/70 hover:bg-white text-gray-800 px-3 py-2 rounded-full shadow-md"
+                    >
+                        ◀
+                    </button>
+                    <button
+                        onClick={goToNext}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/70 hover:bg-white text-gray-800 px-3 py-2 rounded-full shadow-md"
+                    >
+                        ▶
+                    </button>
+
+                    {/* Slide Number */}
+                    <div className="absolute bottom-4 right-4 bg-black/60 text-white text-sm px-3 py-1 rounded-md">
+                        {currentImageIndex + 1} / {images.length}
+                    </div>
                 </div>
             </section>
         </main>
