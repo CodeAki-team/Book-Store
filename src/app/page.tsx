@@ -1,8 +1,26 @@
-import Navbar from "../components/Header/Navbar"; // Adjust the path as needed
-import Footer from "../components/Footer/Footer"; // Adjust the path as needed
-export default function Home() {
-  
-  return(<> <Navbar />
-   <Footer />
+import { supabase } from "@/lib/supabaseClient"
+
+export default async function Home() {
+ 
+  return(<>
+{/* slider  */}
+
+
+
+
+
+
+
+{/* category section  */}
+
+
+
+
+
+{/* card section  */}
+
+
+
+
   </>)
 }

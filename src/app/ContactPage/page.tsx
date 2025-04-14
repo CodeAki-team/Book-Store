@@ -1,6 +1,4 @@
 'use client';
-import Navbar from "../../components/Header/Navbar";
-import Footer from "../../components/Footer/Footer";
 import React, { useState } from 'react';
 import { Mail, Phone, MapPin } from 'lucide-react';
 import { supabase } from '@/lib/supabaseClient';
@@ -61,7 +59,7 @@ const ContactPage: React.FC = () => {
 
     return (
         <>
-            <Navbar />
+         
             <section className="min-h-screen bg-white text-gray-800 py-16 px-4 sm:px-8 lg:px-24">
                 <div className="max-w-5xl mx-auto">
                     <h1 className="text-4xl font-bold text-blue-600 mb-4 text-center">Contact Us</h1>
@@ -171,7 +169,7 @@ const ContactPage: React.FC = () => {
                     </div>
                 </div>
             </section>
-            <Footer />
+        
         </>
     );
 };
