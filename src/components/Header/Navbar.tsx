@@ -1,13 +1,15 @@
 "use client";
+
 import { useState } from "react";
 import { Search, ShoppingCart } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/hooks/useUser";
+import Link from "next/link";
 
 const navItems = [
-    { name: "Home", href: "#" },
-    { name: "Products", href: "#" },
+    { name: "Home", href: "/" },
+    { name: "Products", href: "#" }, // Consider replacing '#' with actual route when available
     { name: "Contact", href: "/contactpage" },
 ];
 
@@ -18,6 +20,7 @@ const Navbar = () => {
     const [searchResults, setSearchResults] = useState<any[]>([]);
     const user = useUser();
     const router = useRouter();
+
     const handleSignOut = async () => {
         await supabase.auth.signOut();
         router.push("/");
@@ -54,10 +57,9 @@ const Navbar = () => {
                             <rect x="3" y="4" width="18" height="16" stroke="currentColor" strokeWidth="2" />
                             <path d="M3 12l9 4 9-4" stroke="currentColor" strokeWidth="2" />
                         </svg>
-
                         <span className="text-3xl font-extrabold text-gray-800 font-[Poppins, sans-serif]">
-                            INKSPIRE
-                        </span>
+              INKSPIRE
+            </span>
                     </div>
 
                     <button
@@ -69,37 +71,32 @@ const Navbar = () => {
                             fill="none"
                             viewBox="0 0 24 24"
                             stroke="currentColor"
-                            className={`w-8 h-8 transform transition-all duration-700 ease-in-out ${isMenuOpen ? 'rotate-45' : ''}`}
+                            className={`w-8 h-8 transform transition-all duration-700 ease-in-out ${isMenuOpen ? "rotate-45" : ""}`}
                         >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                d="M4 6h16M4 12h16M4 18h16"
-                            />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
                         </svg>
                     </button>
 
                     <nav className="hidden md:flex items-center space-x-12">
                         {navItems.map((item) => (
-                            <a
+                            <Link
                                 key={item.name}
                                 href={item.href}
                                 className="group relative text-gray-700 hover:text-blue-600 transition-all pb-1"
                             >
                                 {item.name}
                                 <span className="absolute left-0 bottom-0 h-[2px] w-0 bg-blue-600 transition-all duration-300 group-hover:w-full"></span>
-                            </a>
+                            </Link>
                         ))}
 
-                        <a
-                            href="#"
+                        <Link
+                            href="/cart" // Replace with actual cart route
                             className="group relative flex items-center gap-1 text-gray-700 hover:text-blue-600 transition-all pb-1"
                         >
                             <ShoppingCart size={20} />
                             <span>Cart</span>
                             <span className="absolute left-0 bottom-0 h-[2px] w-0 bg-blue-600 transition-all duration-300 group-hover:w-full"></span>
-                        </a>
+                        </Link>
                     </nav>
 
                     <div className="hidden md:flex items-center gap-5">
@@ -133,12 +130,12 @@ const Navbar = () => {
                                 </button>
                             </div>
                         ) : (
-                            <a
+                            <Link
                                 href="/signup"
                                 className="text-white bg-blue-600 hover:bg-blue-700 transition-all py-2 px-4 rounded-md text-lg cursor-pointer"
                             >
                                 Sign Up
-                            </a>
+                            </Link>
                         )}
                     </div>
                 </div>
@@ -164,22 +161,22 @@ const Navbar = () => {
                 }`}
             >
                 {navItems.map((item) => (
-                    <a
+                    <Link
                         key={item.name}
                         href={item.href}
                         className="text-gray-700 hover:text-blue-600 transition-all duration-700 ease-in-out transform hover:scale-105"
                     >
                         {item.name}
-                    </a>
+                    </Link>
                 ))}
 
-                <a
-                    href="#"
+                <Link
+                    href="/cart"
                     className="flex items-center gap-1 text-gray-700 hover:text-blue-600 transition-all"
                 >
                     <ShoppingCart size={20} />
                     <span>Cart</span>
-                </a>
+                </Link>
             </div>
         </>
     );
