@@ -1,3 +1,4 @@
+"use client";
 import { useState } from "react";
 import { Search, ShoppingCart } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";

@@ -11,29 +11,30 @@ const images = [img1, img2, img3];
 
 export default function Home() {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
-
+    const [isFading, setIsFading] = useState(false);
+    
     useEffect(() => {
         const interval = setInterval(() => {
             setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
-        }, 8000); 
-
+        }, 8000);
         return () => clearInterval(interval);
     }, []);
-
-    const goToPrevious = () => {
-        setCurrentImageIndex((prevIndex) =>
-            prevIndex === 0 ? images.length - 1 : prevIndex - 1
-        );
-    };
-
-    const goToNext = () => {
-        setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
+    
+    const handleClick = (direction: "next" | "prev") => {
+        setIsFading(true);
+        setTimeout(() => {
+            setCurrentImageIndex((prevIndex) => {
+                if (direction === "next") return (prevIndex + 1) % images.length;
+                return prevIndex === 0 ? images.length - 1 : prevIndex - 1;
+            });
+            setIsFading(false);
+        }, 400); // match with fade CSS
     };
 
     return (
         <main className="min-h-[85vh] flex items-start justify-center pt-8 bg-gray-100">
             <section className="relative w-full max-w-7xl mx-auto flex flex-col md:flex-row bg-white shadow-xl overflow-hidden rounded-2xl">
-                {/* Left Text Section */}
+                {/* Text Section */}
                 <div className="w-full md:w-1/2 p-12 flex flex-col justify-center bg-white z-10 relative">
                     <h1 className="text-5xl font-extrabold text-gray-900 mb-6 leading-tight">
                         Welcome to <span className="text-blue-600">INKSPIRE</span>
@@ -51,38 +52,38 @@ export default function Home() {
                     </div>
                 </div>
 
-                {/* Divider Shape */}
+                {/* Divider */}
                 <div className="absolute hidden md:block left-1/2 top-0 h-full w-20 z-0">
                     <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full">
                         <path d="M0,0 C50,50 50,50 100,100 L100,0 Z" fill="#ffffff" />
                     </svg>
                 </div>
 
-                {/* Right Image Section */}
-                <div className="w-full md:w-1/2 relative h-[400px]">
+                {/* Image Section */}
+                <div className="w-full md:w-1/2 relative h-[400px] overflow-hidden">
                     <Image
                         src={images[currentImageIndex]}
                         alt={`Slide ${currentImageIndex + 1}`}
                         fill
-                        className="object-cover transition-opacity duration-[2000ms] ease-in-out rounded-r-2xl"
+                        className={`object-cover rounded-r-2xl transition-opacity duration-500 ease-in-out ${isFading ? 'opacity-0' : 'opacity-100'}`}
                         priority
                     />
 
-                    {/* Navigation Buttons */}
+                    {/* Prev/Next Buttons */}
                     <button
-                        onClick={goToPrevious}
-                        className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/70 hover:bg-white text-gray-800 px-3 py-2 rounded-full shadow-md"
+                        onClick={() => handleClick("prev")}
+                        className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/70 hover:bg-white text-gray-800 px-3 py-2 rounded-full shadow-md transition"
                     >
                         ◀
                     </button>
                     <button
-                        onClick={goToNext}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/70 hover:bg-white text-gray-800 px-3 py-2 rounded-full shadow-md"
+                        onClick={() => handleClick("next")}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/70 hover:bg-white text-gray-800 px-3 py-2 rounded-full shadow-md transition"
                     >
                         ▶
                     </button>
 
-                    {/* Slide Number */}
+                    {/* Slide Indicator */}
                     <div className="absolute bottom-4 right-4 bg-black/60 text-white text-sm px-3 py-1 rounded-md">
                         {currentImageIndex + 1} / {images.length}
                     </div>
