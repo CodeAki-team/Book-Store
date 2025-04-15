@@ -1,6 +1,5 @@
-"use client";
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import "animate.css";
 import Link from "next/link";
@@ -16,6 +15,13 @@ const SignUpForm = () => {
 
     const [loading, setLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
+    const [isClient, setIsClient] = useState(false);
+
+    const router = useRouter();
+
+    useEffect(() => {
+        setIsClient(true);
+    }, []);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -34,11 +40,11 @@ const SignUpForm = () => {
             if (!form.name || !form.email || !form.password) {
                 throw new Error('All fields are required.');
             }
-            
+
             const { data: existingUser, error: emailCheckError } = await supabase
                 .from("users")
                 .select("id")
-                .eq("email", form.email) 
+                .eq("email", form.email)
                 .single();
 
             if (emailCheckError && emailCheckError.code !== "PGRST116") {
@@ -46,14 +52,16 @@ const SignUpForm = () => {
             }
 
             if (existingUser) {
-                
                 setErrorMessage("This email is already in use.");
-                return; 
+                return;
             }
-            
+
             const { data, error } = await supabase.auth.signUp({
                 email: form.email,
                 password: form.password,
+                options: {
+                    emailRedirectTo: "http://localhost:3000/auth/callback",
+                },
             });
 
             if (error) {
@@ -61,7 +69,6 @@ const SignUpForm = () => {
                 return;
             }
 
-            // Now, insert the user data into 'users' table
             const { error: dbInsertError } = await supabase
                 .from("users")
                 .insert([
@@ -77,9 +84,12 @@ const SignUpForm = () => {
                 throw new Error(dbInsertError.message);
             }
 
-            // Reset the form and show success message
             setForm({ name: '', email: '', password: '', confirmPassword: '', phone: '' });
             console.log("Sign-Up Successful!");
+
+            if (router) {
+                router.push("/signin");
+            }
 
         } catch (error: any) {
             setErrorMessage(error.message);
@@ -87,6 +97,10 @@ const SignUpForm = () => {
             setLoading(false);
         }
     };
+
+    if (!isClient) {
+        return null;
+    }
 
     return (
         <div className="w-full max-w-md p-6 bg-white text-gray-800 rounded-lg shadow-xl opacity-0 transform transition-all duration-1000 ease-in-out scale-100 animate__animated animate__fadeInUp animate__delay-0.3s">
