@@ -17,7 +17,6 @@ const Navbar = () => {
     const [searchResults, setSearchResults] = useState<any[]>([]);
     const user = useUser();
     const router = useRouter();
-
     const handleSignOut = async () => {
         await supabase.auth.signOut();
         router.push("/");
