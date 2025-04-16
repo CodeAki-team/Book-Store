@@ -1,98 +1,173 @@
-'use client'
+"use client";
 
-import { useRouter, useSearchParams } from 'next/navigation'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import React, { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Slider } from "@/components/ui/slider";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { Star } from "lucide-react";
 import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from '@/components/ui/select'
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
 
-
-export default function Filters() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-
-  const currentCategories = searchParams.getAll('category')
-  const minPrice = searchParams.get('minPrice') || ''
-  const maxPrice = searchParams.get('maxPrice') || ''
-  const rating = searchParams.get('rating') || ''
-
-  const updateParams = (key: string, value: string) => {
-    const params = new URLSearchParams(searchParams.toString())
-
-    if (value) {
-      params.set(key, value)
-    } else {
-      params.delete(key)
-    }
-
-    router.push(`/products?${params.toString()}`)
-  }
-
-  const handleCategoryToggle = (category: string) => {
-    const params = new URLSearchParams(searchParams.toString())
-    const selected = searchParams.getAll('category')
-
-    if (selected.includes(category)) {
-      const updated = selected.filter((c) => c !== category)
-      params.delete('category')
-      updated.forEach((cat) => params.append('category', cat))
-    } else {
-      params.append('category', category)
-    }
-
-    router.push(`/products?${params.toString()}`)
-  }
-
-  return (
-    <div className="space-y-6">
-      {/* دسته‌بندی‌ها */}
-      <div className="flex flex-wrap gap-4">
-        {categories.map((cat) => (
-          <Label key={cat} className="flex items-center gap-2">
-            <Checkbox
-              checked={currentCategories.includes(cat)}
-              onCheckedChange={() => handleCategoryToggle(cat)}
-            />
-            {cat}
-          </Label>
-        ))}
-      </div>
-
-      {/* فیلتر قیمت و امتیاز */}
-      <div className="flex gap-4 flex-wrap">
-        <Input
-          type="number"
-          placeholder="Min Price"
-          defaultValue={minPrice}
-          onBlur={(e) => updateParams('minPrice', e.target.value)}
-        />
-        <Input
-          type="number"
-          placeholder="Max Price"
-          defaultValue={maxPrice}
-          onBlur={(e) => updateParams('maxPrice', e.target.value)}
-        />
-
-        <Select onValueChange={(value) => updateParams('rating', value)} defaultValue={rating}>
-          <SelectTrigger className="w-[120px]">
-            <SelectValue placeholder="Rating" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="">All</SelectItem>
-            <SelectItem value="1">1+</SelectItem>
-            <SelectItem value="2">2+</SelectItem>
-            <SelectItem value="3">3+</SelectItem>
-            <SelectItem value="4">4+</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-    </div>
-  )
+interface FilterProps {
+  filters: {
+    categories: string[];
+    minPrice: number;
+    maxPrice: number;
+    minRating: number;
+    maxRating: number;
+  };
 }
 
+const ProductFilter = ({ filters }: FilterProps) => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [priceRange, setPriceRange] = useState([
+    filters.minPrice,
+    filters.maxPrice,
+  ]);
+  const [rating, setRating] = useState(0);
+
+  // Initial sync with URL
+  useEffect(() => {
+    const categoriesFromUrl = searchParams.getAll("category");
+    const minPriceFromUrl =
+      Number(searchParams.get("minPrice")) || filters.minPrice;
+    const maxPriceFromUrl =
+      Number(searchParams.get("maxPrice")) || filters.maxPrice;
+    const ratingFromUrl = Number(searchParams.get("rating")) || 0;
+
+    setSelectedCategories(categoriesFromUrl);
+    setPriceRange([minPriceFromUrl, maxPriceFromUrl]);
+    setRating(ratingFromUrl);
+  }, [searchParams, filters]);
+
+  const handleCategoryChange = (category: string) => {
+    setSelectedCategories((prev) =>
+      prev.includes(category)
+        ? prev.filter((c) => c !== category)
+        : [...prev, category]
+    );
+  };
+
+  const getActiveFilterCount = () => {
+    let count = 0;
+
+    if (selectedCategories.length > 0) count += selectedCategories.length;
+    if (
+      priceRange[0] !== filters.minPrice ||
+      priceRange[1] !== filters.maxPrice
+    )
+      count += 1;
+    if (rating > 0) count += 1;
+
+    return count;
+  };
+
+  const activeFilterCount = getActiveFilterCount();
+
+  const handleApplyFilters = () => {
+    const params = new URLSearchParams();
+
+    selectedCategories.forEach((cat) => params.append("category", cat));
+
+    params.set("minPrice", priceRange[0].toString());
+    params.set("maxPrice", priceRange[1].toString());
+    if (rating) params.set("rating", rating.toString());
+
+    router.push(`?${params.toString()}`);
+  };
+
+  return (
+    <div>
+      <Sheet>
+        <SheetTrigger asChild>
+          <Button variant="outline" className="relative">
+            Filters
+            {activeFilterCount > 0 && (
+              <span className="bg-blue-600 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
+                {activeFilterCount}
+              </span>
+            )}
+          </Button>
+        </SheetTrigger>
+
+        <SheetContent side="left" className="w-full max-w-sm overflow-y-auto">
+          <SheetHeader>
+            <SheetTitle>Filters</SheetTitle>
+          </SheetHeader>
+
+          {/* Category */}
+          <div className="mt-6">
+            <Label className="font-semibold mb-2 block">Category</Label>
+            <div className="space-y-2">
+              {filters.categories.map((category) => (
+                <div key={category} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={category}
+                    checked={selectedCategories.includes(category)}
+                    onCheckedChange={() => handleCategoryChange(category)}
+                  />
+                  <Label htmlFor={category} className="capitalize">
+                    {category}
+                  </Label>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Price */}
+          <div className="mt-6">
+            <Label className="font-semibold mb-2 block">Price</Label>
+            <Slider
+              min={filters.minPrice}
+              max={filters.maxPrice}
+              step={1}
+              value={priceRange}
+              onValueChange={setPriceRange}
+            />
+            <div className="text-sm mt-2 text-muted-foreground">
+              ${priceRange[0]} - ${priceRange[1]}
+            </div>
+          </div>
+
+          {/* Rating */}
+          <div className="mt-6">
+            <Label className="font-semibold mb-2 block">Rating</Label>
+            <div className="flex gap-1">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <button
+                  key={star}
+                  type="button"
+                  onClick={() => setRating(star)}
+                  className={`$ {
+                    rating >= star ? "text-yellow-400" : "text-gray-300"
+                  } hover:scale-110 transition-transform`}
+                >
+                  <Star size={20} fill={rating >= star ? "#facc15" : "none"} />
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <Button
+            onClick={handleApplyFilters}
+            className="w-full mt-6 bg-blue-700 text-white hover:bg-blue-800"
+          >
+            Apply Filters
+          </Button>
+        </SheetContent>
+      </Sheet>
+    </div>
+  );
+};
+
+export default ProductFilter;
