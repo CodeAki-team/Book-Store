@@ -92,5 +92,4 @@ export default function Home() {
             </section>
         </main>
     );
->>>>>>> 5e4b6bc4bb65c842aac241992edeea40455d09a4
 }
