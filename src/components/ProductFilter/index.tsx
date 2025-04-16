@@ -36,7 +36,6 @@ const ProductFilter = ({ filters }: FilterProps) => {
   ]);
   const [rating, setRating] = useState(0);
 
-  // Initial sync with URL
   useEffect(() => {
     const categoriesFromUrl = searchParams.getAll("category");
     const minPriceFromUrl =
@@ -49,12 +48,12 @@ const ProductFilter = ({ filters }: FilterProps) => {
     setPriceRange([minPriceFromUrl, maxPriceFromUrl]);
     setRating(ratingFromUrl);
   }, [searchParams, filters]);
+
   const handleResetFilters = () => {
     setSelectedCategories([]);
     setPriceRange([filters.minPrice, filters.maxPrice]);
     setRating(0);
-
-    router.push(window.location.pathname); 
+    router.push(window.location.pathname);
   };
 
   const handleCategoryChange = (category: string) => {
@@ -67,7 +66,6 @@ const ProductFilter = ({ filters }: FilterProps) => {
 
   const getActiveFilterCount = () => {
     let count = 0;
-
     if (selectedCategories.length > 0) count += selectedCategories.length;
     if (
       priceRange[0] !== filters.minPrice ||
@@ -75,7 +73,6 @@ const ProductFilter = ({ filters }: FilterProps) => {
     )
       count += 1;
     if (rating > 0) count += 1;
-
     return count;
   };
 
@@ -85,23 +82,24 @@ const ProductFilter = ({ filters }: FilterProps) => {
     const params = new URLSearchParams();
 
     selectedCategories.forEach((cat) => params.append("category", cat));
-
     params.set("minPrice", priceRange[0].toString());
     params.set("maxPrice", priceRange[1].toString());
     if (rating) params.set("rating", rating.toString());
 
     router.push(`?${params.toString()}`);
-
   };
 
   return (
     <div>
       <Sheet>
         <SheetTrigger asChild>
-          <Button variant="outline" className="relative hover:bg-blue-700 hover:text-white">
-        <FilterIcon></FilterIcon> Filters
+          <Button
+            variant="outline"
+            className="relative hover:bg-blue-700 cursor-pointer hover:text-white"
+          >
+            <FilterIcon className="mr-2" /> Filters
             {activeFilterCount > 0 && (
-              <span className="bg-blue-600 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
+              <span className="ml-2 bg-blue-600 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
                 {activeFilterCount}
               </span>
             )}
@@ -110,16 +108,19 @@ const ProductFilter = ({ filters }: FilterProps) => {
 
         <SheetContent side="left" className="w-full max-w-sm overflow-y-auto">
           <SheetHeader>
-            <SheetTitle className="text-2xl text-blue-700">Filters</SheetTitle>
+            <SheetTitle className="text-3xl font-extrabold text-blue-700">
+              Filters
+            </SheetTitle>
           </SheetHeader>
 
-          {/* Category */}
-          <div className="mt-6">
-            <Label className="font-semibold mb-2 block">Category</Label>
+          {/* Category Filter */}
+          <div className="mt-6 pl-3">
+            <Label className="font-bold mb-2 block text-xl">Category</Label>
             <div className="space-y-2">
               {filters.categories.map((category) => (
                 <div key={category} className="flex items-center space-x-2">
                   <Checkbox
+                    className="cursor-pointer"
                     id={category}
                     checked={selectedCategories.includes(category)}
                     onCheckedChange={() => handleCategoryChange(category)}
@@ -132,10 +133,11 @@ const ProductFilter = ({ filters }: FilterProps) => {
             </div>
           </div>
 
-          {/* Price */}
-          <div className="mt-6">
-            <Label className="font-semibold mb-2 block">Price</Label>
+          {/*Price Filter */}
+          <div className="mt-6 px-3">
+            <Label className="font-semibold mb-2 block text-xl">Price</Label>
             <Slider
+              className="w-full cursor-pointer"
               min={filters.minPrice}
               max={filters.maxPrice}
               step={1}
@@ -147,18 +149,18 @@ const ProductFilter = ({ filters }: FilterProps) => {
             </div>
           </div>
 
-          {/* Rating */}
-          <div className="mt-6">
-            <Label className="font-semibold mb-2 block">Rating</Label>
+          {/* Rating Filter */}
+          <div className="mt-6 px-3">
+            <Label className="font-semibold mb-2 block text-xl">Rating</Label>
             <div className="flex gap-1">
               {[1, 2, 3, 4, 5].map((star) => (
                 <button
                   key={star}
                   type="button"
                   onClick={() => setRating(star)}
-                  className={`$ {
+                  className={` cursor-pointer transition-transform hover:scale-110 ${
                     rating >= star ? "text-yellow-400" : "text-gray-300"
-                  } hover:scale-110 transition-transform`}
+                  }`}
                 >
                   <Star size={20} fill={rating >= star ? "#facc15" : "none"} />
                 </button>
@@ -166,18 +168,22 @@ const ProductFilter = ({ filters }: FilterProps) => {
             </div>
           </div>
 
-          <Button
-            onClick={handleApplyFilters}
-            className="w-full mt-6 bg-blue-700 text-white hover:bg-blue-800"
-          >
-            Apply Filters
-          </Button>
-          <Button
-            onClick={handleResetFilters}
-            className="w-full mt-2 bg-gray-200 text-gray-800 py-2 px-4 rounded-lg hover:bg-gray-300 transition"
-          >
-            Reset Filters
-          </Button>
+          {/* Buttons */}
+          <div className="mt-6 px-3">
+            <Button
+              onClick={handleApplyFilters}
+              className="w-full bg-blue-700 cursor-pointer text-white hover:bg-blue-800"
+            >
+              Apply Filters
+            </Button>
+            <Button
+              onClick={handleResetFilters}
+              variant="outline"
+              className="w-full mt-2 cursor-pointer hover:bg-gray-200"
+            >
+              Reset Filters
+            </Button>
+          </div>
         </SheetContent>
       </Sheet>
     </div>

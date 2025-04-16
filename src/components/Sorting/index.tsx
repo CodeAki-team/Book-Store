@@ -30,6 +30,7 @@ const Sorting = () => {
     return (
       <div className="flex items-center space-x-2">
         <Switch
+        className='cursor-pointer'
           id="in-stock"
           checked={inStockOnly}
           onCheckedChange={handleSwitchChange}

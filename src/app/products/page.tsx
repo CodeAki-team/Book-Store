@@ -7,13 +7,14 @@ import { getProducts } from "@/lib/get-products";
 import { ShoppingCart } from "lucide-react";
 import React from "react";
 
-async function Productpage({ searchParams }: { searchParams: any }) {
+async function Productpage({
+  searchParams,
+}: {
+  searchParams: Record<string, string | string[] | undefined>;
+}) {
   const filters = await getFilters();
-  const query = new URLSearchParams(
-    Object.fromEntries(
-      Object.entries(searchParams).map(([key, value]) => [key, String(value)])
-    )
-  );
+  const query = new URLSearchParams();
+
   const categories = searchParams.category;
   if (categories) {
     if (Array.isArray(categories)) {
@@ -24,20 +25,19 @@ async function Productpage({ searchParams }: { searchParams: any }) {
   }
 
   if (searchParams.minPrice)
-    query.set("minPrice", searchParams.minPrice.toString());
+    query.set("minPrice", String(searchParams.minPrice));
   if (searchParams.maxPrice)
-    query.set("maxPrice", searchParams.maxPrice.toString());
-  if (searchParams.rating) query.set("rating", searchParams.rating.toString());
-  if (searchParams.inStock)
-    query.set("inStock", searchParams.inStock.toString());
-  if (searchParams.sort) query.set("sort", searchParams.sort.toString());
+    query.set("maxPrice", String(searchParams.maxPrice));
+  if (searchParams.rating) query.set("rating", String(searchParams.rating));
+  if (searchParams.inStock) query.set("inStock", String(searchParams.inStock));
+  if (searchParams.sort) query.set("sort", String(searchParams.sort));
 
   const products = await getProducts(query);
   if (products.length === 0) {
     return (
       <div className="min-h-screen flex flex-col">
         <main className="flex flex-col container mx-auto px-4 py-8 ">
-          <h1 className="text-3xl font-bold mb-6">Products</h1>
+          <h1 className="text-4xl font-bold mb-6 text-center">Products</h1>
           <div className="flex justify-between align-middle">
             {" "}
             <Filters filters={filters} />
@@ -55,7 +55,7 @@ async function Productpage({ searchParams }: { searchParams: any }) {
   return (
     <div className="min-h-screen flex flex-col">
       <main className="flex flex-col container mx-auto px-4 py-8 ">
-        <h1 className="text-3xl font-bold mb-6">Products</h1>
+        <h1 className="text-4xl font-bold mb-6 text-center">Products</h1>
         <div className="flex justify-between align-middle">
           {" "}
           <Filters filters={filters} />
@@ -63,19 +63,51 @@ async function Productpage({ searchParams }: { searchParams: any }) {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-8">
-          {products?.map((product) => (
-            <Card key={product.id} className="shadow-md">
-              <CardContent className="space-y-2 flex flex-col h-full justify-between">
-                <img src={product.image} alt={product.title} className="" />
-                <h2 className="text-xl font-semibold">{product.title}</h2>
-                <p className="text-muted-foreground">${product.price}</p>
-                <p>Rating: {product.rating}</p>
-                <p>Category: {product.category}</p>
-                <Button className="w-full mt-2 bg-blue-700" variant="default">
-                  <ShoppingCart></ShoppingCart> Add to Cart
-                </Button>
-              </CardContent>
-            </Card>
+          {products?.map((product, index) => (
+            <div
+              key={product.id}
+              className={`h-full animate__animated animate__fadeInUp`}
+              style={{
+                animationDelay: `${index * 100}ms`,
+                animationDuration: "500ms",
+              }}
+            >
+              <Card className="shadow-md h-full flex flex-col transition-all duration-300">
+                <CardContent className="flex flex-col h-full p-4">
+                  <div className="w-full h-[200px] flex items-center justify-center overflow-hidden rounded-md mb-4">
+                    <img
+                      src={product.image}
+                      alt={product.title}
+                      className="object-contain h-full"
+                    />
+                  </div>
+
+                  <div className="flex-1 flex flex-col justify-between space-y-2">
+                    <div>
+                      <h2 className="text-lg font-semibold line-clamp-2">
+                        {product.title}
+                      </h2>
+                      <p className="text-sm text-muted-foreground">
+                        ${product.price}
+                      </p>
+                      <p className="text-sm text-yellow-600">
+                        ⭐ {product.rating}
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        {product.category}
+                      </p>
+                    </div>
+
+                    <Button
+                      className="w-full mt-2 bg-blue-700 cursor-pointer"
+                      variant="default"
+                    >
+                      <ShoppingCart></ShoppingCart> Add to Cart
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           ))}
         </div>
       </main>
