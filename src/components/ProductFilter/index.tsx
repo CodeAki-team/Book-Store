@@ -49,6 +49,13 @@ const ProductFilter = ({ filters }: FilterProps) => {
     setPriceRange([minPriceFromUrl, maxPriceFromUrl]);
     setRating(ratingFromUrl);
   }, [searchParams, filters]);
+  const handleResetFilters = () => {
+    setSelectedCategories([]);
+    setPriceRange([filters.minPrice, filters.maxPrice]);
+    setRating(0);
+
+    router.push(window.location.pathname); // فقط مسیر بدون query
+  };
 
   const handleCategoryChange = (category: string) => {
     setSelectedCategories((prev) =>
@@ -84,6 +91,13 @@ const ProductFilter = ({ filters }: FilterProps) => {
     if (rating) params.set("rating", rating.toString());
 
     router.push(`?${params.toString()}`);
+    const handleResetFilters = () => {
+      setSelectedCategories([]);
+      setPriceRange([filters.minPrice, filters.maxPrice]);
+      setRating(0);
+
+      router.push(window.location.pathname); // فقط مسیر بدون query
+    };
   };
 
   return (
@@ -102,7 +116,7 @@ const ProductFilter = ({ filters }: FilterProps) => {
 
         <SheetContent side="left" className="w-full max-w-sm overflow-y-auto">
           <SheetHeader>
-            <SheetTitle>Filters</SheetTitle>
+            <SheetTitle className="text-2xl text-blue-700">Filters</SheetTitle>
           </SheetHeader>
 
           {/* Category */}
@@ -163,6 +177,12 @@ const ProductFilter = ({ filters }: FilterProps) => {
             className="w-full mt-6 bg-blue-700 text-white hover:bg-blue-800"
           >
             Apply Filters
+          </Button>
+          <Button
+            onClick={handleResetFilters}
+            className="w-full mt-2 bg-gray-200 text-gray-800 py-2 px-4 rounded-lg hover:bg-gray-300 transition"
+          >
+            Reset Filters
           </Button>
         </SheetContent>
       </Sheet>

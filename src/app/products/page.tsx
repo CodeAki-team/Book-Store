@@ -12,7 +12,22 @@ async function Productpage({ searchParams }: { searchParams: any }) {
       Object.entries(searchParams).map(([key, value]) => [key, String(value)])
     )
   );
-  
+  const categories = searchParams.category;
+  if (categories) {
+    if (Array.isArray(categories)) {
+      categories.forEach((c) => query.append("category", c));
+    } else {
+      query.append("category", categories); 
+    }
+  }
+
+
+  if (searchParams.minPrice) query.set("minPrice", searchParams.minPrice.toString());
+  if (searchParams.maxPrice) query.set("maxPrice", searchParams.maxPrice.toString());
+  if (searchParams.rating) query.set("rating", searchParams.rating.toString());
+  if (searchParams.inStock) query.set("inStock", searchParams.inStock.toString());
+  if (searchParams.sort) query.set("sort", searchParams.sort.toString());
+
   const products = await getProducts(query);
 
   // {products.length > 0 ? (
