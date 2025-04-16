@@ -6,6 +6,7 @@ import React, { useEffect, useState } from 'react'
 import img1 from "@/assets/HeroImage1.jpg";
 import img2 from "@/assets/HeroImage2.jpg";
 import img3 from "@/assets/HeroImage3.jpg";
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 const images = [img1, img2, img3];
 const Heroslider = () => {
 
@@ -71,13 +72,13 @@ const Heroslider = () => {
             onClick={() => handleClick("prev")}
             className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/70 hover:bg-white text-gray-800 px-3 py-2 rounded-full shadow-md transition"
         >
-            ◀
+            <ChevronLeft/>
         </button>
         <button
             onClick={() => handleClick("next")}
             className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/70 hover:bg-white text-gray-800 px-3 py-2 rounded-full shadow-md transition"
         >
-            ▶
+        <ChevronRight/>
         </button>
 
         {/* Slide Indicator */}

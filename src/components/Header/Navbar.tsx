@@ -9,7 +9,7 @@ import Link from "next/link";
 
 const navItems = [
     { name: "Home", href: "/" },
-    { name: "Products", href: "#" }, // Consider replacing '#' with actual route when available
+    { name: "Products", href: "/products" }, // Consider replacing '#' with actual route when available
     { name: "Contact", href: "/contactpage" },
 ];
 
