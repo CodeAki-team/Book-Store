@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { Star } from "lucide-react";
+import { FilterIcon, Star } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -54,7 +54,7 @@ const ProductFilter = ({ filters }: FilterProps) => {
     setPriceRange([filters.minPrice, filters.maxPrice]);
     setRating(0);
 
-    router.push(window.location.pathname); // فقط مسیر بدون query
+    router.push(window.location.pathname); 
   };
 
   const handleCategoryChange = (category: string) => {
@@ -91,21 +91,15 @@ const ProductFilter = ({ filters }: FilterProps) => {
     if (rating) params.set("rating", rating.toString());
 
     router.push(`?${params.toString()}`);
-    const handleResetFilters = () => {
-      setSelectedCategories([]);
-      setPriceRange([filters.minPrice, filters.maxPrice]);
-      setRating(0);
 
-      router.push(window.location.pathname); // فقط مسیر بدون query
-    };
   };
 
   return (
     <div>
       <Sheet>
         <SheetTrigger asChild>
-          <Button variant="outline" className="relative">
-            Filters
+          <Button variant="outline" className="relative hover:bg-blue-700 hover:text-white">
+        <FilterIcon></FilterIcon> Filters
             {activeFilterCount > 0 && (
               <span className="bg-blue-600 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
                 {activeFilterCount}

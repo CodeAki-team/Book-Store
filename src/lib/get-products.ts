@@ -22,8 +22,9 @@ export const getProducts = async (params: URLSearchParams) => {
   }
 
   if (params.get("inStock") === "true") {
-    query = query.eq("in_stock", true);
+    query = query.gt("stock", 0); 
   }
+  
 
   const sort = params.get("sort");
   if (sort) {
