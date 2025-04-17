@@ -50,7 +50,7 @@ export default function TopProductsSlider({
   );
 
   return (
-    <section className="w-[80%] m-3 rounded-xl relative bg-gradient-to-b from-white via-slate-50 to-white py-16 border-y border-gray-200 shadow-inner">
+    <section className="w-[80%] m-3 rounded-xl relative bg-gray-100 from-white via-slate-50 to-white py-16 border-y border-gray-200 shadow-inner">
       <div className="container mx-auto px-4">
         <h2 className="text-4xl font-extrabold text-center mb-16 animate__animated animate__fadeInDown">
           Most Rated Books
@@ -86,23 +86,23 @@ export default function TopProductsSlider({
                     {globalRank}
                   </div>
 
-                  <Card className=" h-full relative z-10 w-[220px] rounded-2xl shadow-lg border hover:scale-[1.05] transition-all duration-300 bg-white">
+                  <Card className="h-full relative z-10 w-[280px] rounded-3xl shadow-xl border hover:scale-[1.05] transition-all duration-300 bg-white">
                     <CardContent className="pt-6">
                       <Image
                         src={product.image}
                         alt={product.title}
-                        width={200}
-                        height={160}
-                        className="w-full h-[160px] object-cover rounded-xl mb-3"
+                        width={260}
+                        height={200}
+                        className="w-full h-[300px] object-cover rounded-xl mb-4"
                       />
-                      <h3 className="text-lg font-semibold text-center">
+                      <h3 className="text-xl font-bold text-center">
                         {product.title}
                       </h3>
-                      <div className="flex justify-center items-center gap-1 mt-2">
+                      <div className="flex justify-center items-center gap-1 mt-3">
                         {Array.from({ length: 5 }).map((_, i) => (
                           <Star
                             key={i}
-                            size={16}
+                            size={18}
                             className={
                               i < Math.round(product.rating)
                                 ? "text-yellow-400"
