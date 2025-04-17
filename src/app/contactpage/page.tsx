@@ -1,4 +1,5 @@
-'use client';
+"use client";
+
 import React, { useState } from 'react';
 import { Mail, Phone, MapPin } from 'lucide-react';
 import { supabase } from '@/lib/supabaseClient';
@@ -21,9 +22,10 @@ const ContactPage: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
-        setErrorMessage('');
+        setErrorMessage(''); // Clear previous error message
 
         try {
+            // Submit the form data without any email duplicate check
             const { data, error } = await supabase
                 .from('contact_form_submissions')
                 .insert([
@@ -42,6 +44,12 @@ const ContactPage: React.FC = () => {
             console.log('Form submitted:', data);
             setSuccess(true);
             setForm({ name: '', email: '', message: '' });
+
+            // Hide success message after 3 seconds
+            setTimeout(() => {
+                setSuccess(false);
+            }, 3000);
+
         } catch (error) {
             if (error instanceof Error) {
                 console.error('Error submitting form:', error.message);
@@ -56,21 +64,21 @@ const ContactPage: React.FC = () => {
     };
 
     return (
-        <section className="min-h-screen bg-gray-50 text-gray-800 py-12 px-4 sm:px-8 lg:px-24">
+        <section className="min-h-screen bg-gradient-to-r from-blue-50 to-blue-100 text-gray-800 py-12 px-4 sm:px-8 lg:px-24">
             <div className="max-w-5xl mx-auto">
-                <h1 className="text-4xl font-bold text-blue-600 mb-4 text-center">Contact Us</h1>
-                <p className="text-gray-600 mb-10 text-center">
-                    Have a question or want to work together? Drop us a message!
+                <h1 className="text-5xl font-bold text-blue-700 mb-4 text-center">Contact Us</h1>
+                <p className="text-gray-600 mb-10 text-center text-lg">
+                    Have a question or want to collaborate? Send us a message!
                 </p>
 
                 {success && (
-                    <div className="mb-6 p-4 bg-green-100 text-green-800 rounded-md text-center">
+                    <div className="mb-6 p-4 bg-green-100 text-green-800 rounded-lg text-center">
                         Your message has been successfully submitted!
                     </div>
                 )}
 
                 {errorMessage && (
-                    <div className="mb-6 p-4 bg-red-100 text-red-800 rounded-md text-center">
+                    <div className="mb-6 p-4 bg-red-100 text-red-800 rounded-lg text-center">
                         {errorMessage}
                     </div>
                 )}
@@ -104,7 +112,7 @@ const ContactPage: React.FC = () => {
                     {/* Contact Form */}
                     <form
                         onSubmit={handleSubmit}
-                        className="bg-white shadow-md rounded-lg p-6 sm:p-8 border border-blue-300 w-full"
+                        className="bg-white shadow-lg rounded-lg p-8 sm:p-10 border border-blue-300 w-full space-y-6"
                     >
                         <div className="mb-6">
                             <label htmlFor="name" className="block text-sm font-semibold mb-2 text-blue-700">
@@ -116,7 +124,7 @@ const ContactPage: React.FC = () => {
                                 name="name"
                                 value={form.name}
                                 onChange={handleChange}
-                                className="w-full px-4 py-2 border border-blue-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full px-4 py-3 border border-blue-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
                                 placeholder="Your name"
                                 required
                             />
@@ -132,7 +140,7 @@ const ContactPage: React.FC = () => {
                                 name="email"
                                 value={form.email}
                                 onChange={handleChange}
-                                className="w-full px-4 py-2 border border-blue-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full px-4 py-3 border border-blue-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
                                 placeholder="you@example.com"
                                 required
                             />
@@ -148,7 +156,7 @@ const ContactPage: React.FC = () => {
                                 rows={5}
                                 value={form.message}
                                 onChange={handleChange}
-                                className="w-full px-4 py-2 border border-blue-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full px-4 py-3 border border-blue-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
                                 placeholder="Type your message here..."
                                 required
                             />
@@ -156,7 +164,7 @@ const ContactPage: React.FC = () => {
 
                         <button
                             type="submit"
-                            className={`w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-md transition-colors ${loading ? 'cursor-not-allowed opacity-50' : ''}`}
+                            className={`w-full bg-blue-600 cursor-pointer hover:bg-blue-700 text-white font-semibold py-3 rounded-md transition-colors ${loading ? 'cursor-not-allowed opacity-50' : ''}`}
                             disabled={loading}
                         >
                             {loading ? 'Submitting...' : 'Send Message'}

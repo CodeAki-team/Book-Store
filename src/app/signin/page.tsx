@@ -25,6 +25,11 @@ export default function SignInPage() {
         setShowResend(false);
 
         try {
+            if (!form.email || !form.password) {
+                setErrorMessage("Email and password are required.");
+                return;
+            }
+
             const { data, error } = await supabase.auth.signInWithPassword({
                 email: form.email,
                 password: form.password,
@@ -84,6 +89,7 @@ export default function SignInPage() {
                             value={form.email}
                             onChange={handleChange}
                             className="w-full px-4 py-2 border border-blue-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                            placeholder="Enter your email"
                             required
                         />
                     </div>
@@ -97,6 +103,7 @@ export default function SignInPage() {
                             value={form.password}
                             onChange={handleChange}
                             className="w-full px-4 py-2 border border-blue-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                            placeholder="Enter your password"
                             required
                         />
                     </div>
