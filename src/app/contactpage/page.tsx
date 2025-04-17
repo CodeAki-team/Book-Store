@@ -56,7 +56,7 @@ const ContactPage: React.FC = () => {
     };
 
     return (
-        <section className="min-h-screen bg-white text-gray-800 py-12 px-4 sm:px-8 lg:px-24">
+        <section className="min-h-screen bg-gray-50 text-gray-800 py-12 px-4 sm:px-8 lg:px-24">
             <div className="max-w-5xl mx-auto">
                 <h1 className="text-4xl font-bold text-blue-600 mb-4 text-center">Contact Us</h1>
                 <p className="text-gray-600 mb-10 text-center">
