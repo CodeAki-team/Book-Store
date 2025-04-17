@@ -1,13 +1,15 @@
 import Heroslider from "@/components/Heroslider";
+import TopProducts from "@/components/Topproducts";
+import { getTopRatedBooks } from "@/lib/get-topratedbooks";
 import Authorscard from "@/components/AuthorsCard";
 
-export default function Home() {
+export default async function Home() {
+    const topRatedBooks = await getTopRatedBooks();
     return (
-        <main className="min-h-[85vh] bg-gray-100 pt-8">
-            <div className="flex flex-col items-center gap-12">
-                <Heroslider />
-                <Authorscard />
-            </div>
+        <main className="min-h-[85vh] flex flex-col  justify-center items-center pt-8 bg-gray-100">
+            <Heroslider />
+            <TopProducts products={topRatedBooks} />
+            <Authorscard />
         </main>
     );
 }
