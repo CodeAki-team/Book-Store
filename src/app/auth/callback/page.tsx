@@ -16,7 +16,7 @@ export default function EmailCallbackPage() {
                 setMessage("Verification failed. Try signing in manually.");
             } else {
                 setMessage("Email confirmed! Redirecting...");
-                setTimeout(() => router.push("/"), 2000); // Redirect after 2s
+                setTimeout(() => router.push("/"), 2000); 
             }
         };
 
