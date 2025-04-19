@@ -4,6 +4,9 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Header/Navbar";
 import Footer from "@/components/Footer/Footer";
+import AuthCartSync from "@/components/AuthCartSync/AuthCartSync";
+import CartSyncProvider from "@/components/context/CartSyncProvider";
+
 
 
 
@@ -33,6 +36,8 @@ export default function RootLayout({
         <body
             className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
+         {/* <CartSyncProvider> */}
+            <AuthCartSync/>
         {/* Header/Navbar */}
         <Navbar />
 
@@ -41,8 +46,11 @@ export default function RootLayout({
 
         {/* Footer */}
         <Footer />
+        {/* </CartSyncProvider> */}
+
         </body>
         </html>
+        
     );
 
 }
