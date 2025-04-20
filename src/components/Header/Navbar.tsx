@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Search, ShoppingCart } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
-import { useUser } from "@/hooks/useUser";
+import { useUser } from "@/hooks/useUser"; // if you have custom hook for user
 import Link from "next/link";
 
 const navItems = [
@@ -18,11 +18,12 @@ const Navbar = () => {
     const [isSearchVisible, setIsSearchVisible] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
     const [searchResults, setSearchResults] = useState<any[]>([]);
-    const user = useUser();
+    const [user, setUser] = useState<any>(null); // Initialize with null for signed-out state
     const router = useRouter();
 
     const handleSignOut = async () => {
         await supabase.auth.signOut();
+        setUser(null); // Update state after sign out
         router.push("/");
     };
 
@@ -43,6 +44,39 @@ const Navbar = () => {
         }
     };
 
+    // Check user session on mount
+    useEffect(() => {
+        const checkSession = async () => {
+            const { data: { session }, error } = await supabase.auth.getSession();
+
+            if (error) {
+                console.error("Error fetching session:", error.message);
+            }
+
+            if (session) {
+                setUser(session.user); // Set user if signed in
+            } else {
+                setUser(null); // Set null if not signed in
+            }
+        };
+
+        checkSession();
+
+        // Optionally, listen to auth state changes
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+            if (session) {
+                setUser(session.user);
+            } else {
+                setUser(null);
+            }
+        });
+
+        // Clean up the subscription on unmount
+        return () => {
+            subscription?.unsubscribe();
+        };
+    }, []);
+
     return (
         <>
             <header className="sticky top-0 z-50 bg-white shadow-md">
@@ -60,8 +94,8 @@ const Navbar = () => {
                             <path d="M3 12l9 4 9-4" strokeWidth="2" />
                         </svg>
                         <span className="text-3xl font-extrabold text-gray-800 font-[Poppins, sans-serif]">
-                            INKSPIRE
-                        </span>
+              INKSPIRE
+            </span>
                     </div>
 
                     {/* Menu toggle for mobile */}

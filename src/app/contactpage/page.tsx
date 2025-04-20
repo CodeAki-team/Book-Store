@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { useState } from 'react';
 import { Mail, Phone, MapPin } from 'lucide-react';
@@ -38,7 +38,7 @@ const ContactPage: React.FC = () => {
             if (error) {
                 console.error('Error submitting form:', error);
                 setErrorMessage(error.message || 'An unexpected error occurred.');
-                throw new Error(error.message || 'Unknown error');
+                return; // Return early instead of throwing an error
             }
 
             console.log('Form submitted:', data);

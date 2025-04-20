@@ -8,7 +8,7 @@ export const getProducts = async (params: URLSearchParams) => {
   if (categories.length > 0) {
     query = query.in("category", categories);
   }
-  
+
 
   const minPrice = params.get("minPrice");
   const maxPrice = params.get("maxPrice");
@@ -22,9 +22,9 @@ export const getProducts = async (params: URLSearchParams) => {
   }
 
   if (params.get("inStock") === "true") {
-    query = query.gt("stock", 0); 
+    query = query.gt("stock", 0);
   }
-  
+
 
   const sort = params.get("sort");
   if (sort) {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import "animate.css";
@@ -43,15 +43,18 @@ const SignUpForm = () => {
             const { name, email, password, confirmPassword, phone } = form;
 
             if (!name || !email || !password || !confirmPassword || !phone) {
-                throw new Error('All fields are required.');
+                setErrorMessage('All fields are required.');
+                return;
             }
 
             if (!validatePhone(phone)) {
-                throw new Error('Please enter a valid phone number.');
+                setErrorMessage('Please enter a valid phone number.');
+                return;
             }
 
             if (password !== confirmPassword) {
-                throw new Error('Passwords do not match.');
+                setErrorMessage('Passwords do not match.');
+                return;
             }
 
             const { data: existingUser, error: emailCheckError } = await supabase
@@ -60,8 +63,9 @@ const SignUpForm = () => {
                 .eq("email", email)
                 .single();
 
-            if (emailCheckError && emailCheckError.code !== "PGRST116") {
-                throw new Error(emailCheckError.message);
+            if (emailCheckError && emailCheckError.code !== "GRIST116") {
+                setErrorMessage(emailCheckError.message);
+                return;
             }
 
             if (existingUser) {
@@ -78,7 +82,8 @@ const SignUpForm = () => {
             });
 
             if (error) {
-                throw new Error(error.message);
+                setErrorMessage(error.message);
+                return;
             }
 
             const { error: dbInsertError } = await supabase
@@ -93,7 +98,8 @@ const SignUpForm = () => {
                 ]);
 
             if (dbInsertError) {
-                throw new Error(dbInsertError.message);
+                setErrorMessage(dbInsertError.message);
+                return;
             }
 
             setForm({
@@ -107,7 +113,7 @@ const SignUpForm = () => {
             router.push("/signin");
 
         } catch (error: any) {
-            setErrorMessage(error.message);
+            setErrorMessage("An unexpected error occurred. Please try again.");
         } finally {
             setLoading(false);
         }
@@ -160,7 +166,7 @@ const SignUpForm = () => {
 
                 <button
                     type="submit"
-                    className={`w-full bg-blue-700 hover:bg-blue-800 text-white font-semibold py-2 rounded-md transition-all transform hover:scale-105 ${
+                    className={`w-full cursor-pointer bg-blue-700 hover:bg-blue-800 text-white font-semibold py-2 rounded-md transition-all transform hover:scale-105 ${
                         loading ? 'cursor-not-allowed opacity-50' : ''
                     }`}
                     disabled={loading}
