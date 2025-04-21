@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { CardContent } from "@/components/ui/card";
 import Image from "next/image";
-import Link from "next/link"; // ✅ Import Link
+import Link from "next/link"; 
 
 interface Book {
     id: number;
@@ -36,7 +36,7 @@ export default function SummerReads() {
                         {books.map((book) => (
                             <Link
                                 key={book.id}
-                                href={`/products/${book.id}`} // ✅ Dynamic route
+                                href={`/products/${book.id}`} 
                                 className="w-[260px] h-[450px] bg-white rounded-lg shadow-md transition-all duration-300 hover:shadow-xl border border-gray-200 no-underline"
                             >
                                 <CardContent className="flex flex-col justify-start p-4 h-full">

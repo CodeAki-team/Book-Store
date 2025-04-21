@@ -20,10 +20,10 @@ export async function POST(request: Request) {
 
         console.log("Received message:", message);
 
-        // Get the hardcoded response
+        
         const reply = getHardcodedResponse(message);
 
-        // Send the hardcoded reply back to the client
+       
         return NextResponse.json({ reply });
     } catch (error) {
         console.error('Error processing request:', error);

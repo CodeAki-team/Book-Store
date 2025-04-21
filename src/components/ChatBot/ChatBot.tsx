@@ -22,7 +22,7 @@ export default function ChatBot() {
         setMessages((prev) => [...prev, userMessage]);
         setInput("");
         setLoading(true);
-        setErrorMessage(null); // Reset the error message on each new message
+        setErrorMessage(null); 
 
         try {
             const res = await fetch("/api/chat", {
