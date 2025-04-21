@@ -2,6 +2,7 @@ import Heroslider from "@/components/Heroslider";
 import TopProducts from "@/components/Topproducts";
 import { getTopRatedBooks } from "@/lib/get-topratedbooks";
 import Authorscard from "@/components/AuthorsCard";
+import SummerReads from "@/components/SummerReads";
 
 export default async function Home() {
     const topRatedBooks = await getTopRatedBooks();
@@ -10,6 +11,8 @@ export default async function Home() {
             <Heroslider />
             <TopProducts products={topRatedBooks} />
             <Authorscard />
+            <SummerReads />
+            
         </main>
     );
 }

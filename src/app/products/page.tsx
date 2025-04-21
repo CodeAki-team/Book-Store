@@ -36,12 +36,12 @@ async function Productpage({ searchParams }: PageProps) {
   if (searchParams.inStock) query.set("inStock", String(searchParams.inStock));
   if (searchParams.sort) query.set("sort", String(searchParams.sort));
 
-  // Fetch filters
+  
   const filters = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/api/filters`, {
     cache: "force-cache",
   }).then((res) => res.json());
 
-  // Fetch filtered products
+  
   const products: Product[] = await fetch(
       `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/api/products?${query.toString()}`,
       {
