@@ -1,6 +1,7 @@
-import { useSession } from '@supabase/auth-helpers-react';
+
 import { useLocalCartStore } from './useLocalCartStore';
 import { addToSupabaseCart } from '@/lib/cart';
+import { useUser } from './useUser';
 
 interface CartItem {
     id: string;
@@ -12,14 +13,14 @@ interface CartItem {
 }
 
 export const useSmartCart = () => {
-    const session = useSession();
+   const user=useUser()
     const { addToLocalCart } = useLocalCartStore();
 
     
     const addItem = async (item: CartItem) => {
         console.log('Adding item:', item);  
-        if (session?.user) {
-            await addToSupabaseCart(session.user.id, item);
+        if (user) {
+            await addToSupabaseCart(user.id, item);
         } else {
             console.log('Adding to local cart (guest)', item);  
             addToLocalCart(item);

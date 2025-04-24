@@ -20,23 +20,22 @@ interface LocalCartState {
 export const useLocalCartStore = create<LocalCartState>()(
     persist(
         (set, get) => ({
-            items: [], 
+            items: [],
             addToLocalCart: (item: CartItem) => {
-                console.log('Current cart items:', get().items);  
                 const existing = get().items.find((i) => i.book_id === item.book_id);
-                console.log('Existing item:', existing);  
                 if (existing) {
+                    // Update quantity if item already exists
                     set({
                         items: get().items.map((i) =>
                             i.book_id === item.book_id
-                                ? {...i, quantity: i.quantity + item.quantity}
+                                ? { ...i, quantity: i.quantity + item.quantity }
                                 : i
                         ),
                     });
                 } else {
+                    // Add new item to the cart
                     set({ items: [...get().items, item] });
                 }
-                console.log('Updated cart items:', get().items); 
             },
             updateQuantity: (book_id, quantity) => {
                 set({
@@ -45,10 +44,10 @@ export const useLocalCartStore = create<LocalCartState>()(
                     ),
                 });
             },
-            clearLocalCart: () => set({ items: [] }), 
+            clearLocalCart: () => set({ items: [] }),
         }),
         {
-            name: 'guest-cart', 
+            name: 'guest-cart', // LocalStorage name for persistence
         }
     )
 );
