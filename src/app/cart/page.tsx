@@ -21,52 +21,52 @@ const Cart = () => {
     const [cartItems, setCartItems] = useState<CartItem[]>([]);
     const [error, setError] = useState<string | null>(null);
 
-    const addItemToCart = async (bookId: number, quantity: number) => {
-        try {
-            const userRes = await supabase.auth.getUser();
-            const user = userRes.data?.user;
+    // const addItemToCart = async (bookId: number, quantity: number) => {
+    //     try {
+    //         const userRes = await supabase.auth.getUser();
+    //         const user = userRes.data?.user;
 
-            if (!user) {
-                const guestCart = JSON.parse(localStorage.getItem('guest_cart') || '[]');
-                const existingItem = guestCart.find((item: CartItem) => item.book_id === bookId);
+    //         if (!user) {
+    //             const guestCart = JSON.parse(localStorage.getItem('cart') || '[]');
+    //             const existingItem = guestCart.find((item: CartItem) => item.book_id === bookId);
 
-                if (existingItem) {
-                    existingItem.quantity += quantity;
-                } else {
-                    guestCart.push({ book_id: bookId, quantity });
-                }
+    //             if (existingItem) {
+    //                 existingItem.quantity += quantity;
+    //             } else {
+    //                 guestCart.push({ book_id: bookId, quantity });
+    //             }
 
-                localStorage.setItem('guest_cart', JSON.stringify(guestCart));
-                setCartItems(guestCart);
-            } else {
-                const { data, error } = await supabase
-                    .from('cart')
-                    .upsert({ user_id: user.id, book_id: bookId, quantity });
+    //             localStorage.setItem('guest_cart', JSON.stringify(guestCart));
+    //             setCartItems(guestCart);
+    //         } else {
+    //             const { data, error } = await supabase
+    //                 .from('cart')
+    //                 .upsert({ user_id: user.id, book_id: bookId, quantity });
 
-                if (error) {
-                    setError('Failed to add item to your cart.');
-                    console.error('Error adding item to cart:', error);
-                    return;
-                }
+    //             if (error) {
+    //                 setError('Failed to add item to your cart.');
+    //                 console.error('Error adding item to cart:', error);
+    //                 return;
+    //             }
 
-                const { data: updatedCart, error: fetchError } = await supabase
-                    .from('cart')
-                    .select('*, books(*)')
-                    .eq('user_id', user.id);
+    //             const { data: updatedCart, error: fetchError } = await supabase
+    //                 .from('cart')
+    //                 .select('*, books(*)')
+    //                 .eq('user_id', user.id);
 
-                if (fetchError) {
-                    setError('Failed to load updated cart.');
-                    console.error('Error fetching updated cart data:', fetchError);
-                    return;
-                }
+    //             if (fetchError) {
+    //                 setError('Failed to load updated cart.');
+    //                 console.error('Error fetching updated cart data:', fetchError);
+    //                 return;
+    //             }
 
-                setCartItems(updatedCart || []);
-            }
-        } catch (err) {
-            console.error('Error adding item to cart:', err);
-            setError('Failed to add item to the cart.');
-        }
-    };
+    //             setCartItems(updatedCart || []);
+    //         }
+    //     } catch (err) {
+    //         console.error('Error adding item to cart:', err);
+    //         setError('Failed to add item to the cart.');
+    //     }
+    // };
 
     useEffect(() => {
         const loadCart = async () => {
@@ -75,7 +75,8 @@ const Cart = () => {
                 const user = userRes.data?.user;
 
                 if (!user) {
-                    const guestCart = JSON.parse(localStorage.getItem('guest_cart') || '[]');
+                    const guestCart = JSON.parse(localStorage.getItem('cart') || '[]');
+                    console.log(guestCart)
                     if (guestCart.length === 0) {
                         setCartItems([]);
                         return;
@@ -129,9 +130,9 @@ const Cart = () => {
             const user = userRes.data?.user;
 
             if (!user) {
-                const guestCart = JSON.parse(localStorage.getItem('guest_cart') || '[]');
+                const guestCart = JSON.parse(localStorage.getItem('cart') || '[]');
                 const updated = guestCart.filter((item: CartItem) => item.book_id !== bookId);
-                localStorage.setItem('guest_cart', JSON.stringify(updated));
+                localStorage.setItem('cart', JSON.stringify(updated));
                 setCartItems(updated);
             } else {
                 const { error } = await supabase.from('cart').delete().eq('user_id', user.id).eq('book_id', bookId);
@@ -257,3 +258,4 @@ const Cart = () => {
 };
 
 export default Cart;
+
