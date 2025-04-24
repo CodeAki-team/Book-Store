@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { Search, ShoppingCart } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
-import { useUser } from "@/hooks/useUser"; // if you have custom hook for user
 import Link from "next/link";
 
 const navItems = [
@@ -18,7 +17,11 @@ const Navbar = () => {
     const [isSearchVisible, setIsSearchVisible] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
     const [searchResults, setSearchResults] = useState<any[]>([]);
-    const [user, setUser] = useState<any>(null);
+
+
+
+    const [user, setUser] = useState<any>(null); 
+
     const router = useRouter();
 
     const handleSignOut = async () => {
@@ -82,7 +85,7 @@ const Navbar = () => {
             <header className="sticky top-0 z-50 bg-white shadow-md">
                 <div className="mx-auto max-w-6xl flex items-center justify-between p-3">
                     {/* Logo */}
-                    <div className="flex items-center space-x-3">
+                    <Link href="/" className="flex items-center space-x-3 cursor-pointer">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             viewBox="0 0 24 24"
@@ -93,15 +96,16 @@ const Navbar = () => {
                             <rect x="3" y="4" width="18" height="16" strokeWidth="2" />
                             <path d="M3 12l9 4 9-4" strokeWidth="2" />
                         </svg>
-                        <span className="text-3xl font-extrabold text-gray-800 font-[Poppins, sans-serif]">
-              INKSPIRE
-            </span>
-                    </div>
+                        <span className="text-3xl font-extrabold text-gray-800 font-[Poppins, sans-serif] cursor-pointer">
+        INKSPIRE
+    </span>
+                    </Link>
+
 
                     {/* Menu toggle for mobile */}
                     <button
                         onClick={() => setIsMenuOpen(!isMenuOpen)}
-                        className="md:hidden text-gray-600 hover:text-blue-600 transition-all duration-700 ease-in-out transform hover:scale-105"
+                        className="md:hidden text-gray-600 hover:text-blue-600 transition-all duration-700 ease-in-out transform hover:scale-105 cursor-pointer"
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -235,7 +239,6 @@ const Navbar = () => {
                     </ul>
                 </div>
             )}
-
             {/* Mobile Menu */}
             <div
                 className={`md:hidden flex flex-col items-center space-y-4 bg-white p-4 shadow-md ${
@@ -259,7 +262,73 @@ const Navbar = () => {
                     <ShoppingCart size={20} />
                     <span>Cart</span>
                 </Link>
+
+                {/* 🔍 Search Icon + Field (Mobile) */}
+                <button
+                    onClick={() => setIsSearchVisible(!isSearchVisible)}
+                    className="text-gray-600 hover:text-blue-600 transition-all cursor-pointer"
+                >
+                    <Search size={26} />
+                </button>
+
+                {isSearchVisible && (
+                    <form
+                        onSubmit={handleSearchSubmit}
+                        className="flex flex-col items-center gap-2 w-full"
+                    >
+                        <input
+                            type="text"
+                            placeholder="Search for books..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="p-2 border border-gray-300 rounded-md w-full max-w-sm"
+                        />
+                        <button
+                            type="submit"
+                            className="bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700 text-sm"
+                        >
+                            Search
+                        </button>
+                    </form>
+                )}
+
+                {/*Auth Info for Mobile */}
+                {user ? (
+                    <div className="flex flex-col items-center gap-2 mt-4">
+                        <div className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-4 py-1 rounded-full shadow-sm text-sm font-medium max-w-[200px] truncate">
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-4 w-4 text-white"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M5.121 17.804A13.937 13.937 0 0112 15c2.485 0 4.779.76 6.879 2.057M15 10a3 3 0 11-6 0 3 3 0 016 0z"
+                                />
+                            </svg>
+                            <span className="truncate">{user.email}</span>
+                        </div>
+                        <button
+                            onClick={handleSignOut}
+                            className="bg-red-600 hover:bg-red-700 text-white py-1 px-4 rounded-md text-sm cursor-pointer"
+                        >
+                            Sign Out
+                        </button>
+                    </div>
+                ) : (
+                    <Link
+                        href="/signup"
+                        className="text-white bg-blue-600 hover:bg-blue-700 transition-all py-2 px-6 rounded-md text-sm mt-4 cursor-pointer"
+                    >
+                        Sign Up
+                    </Link>
+                )}
             </div>
+
         </>
     );
 };
