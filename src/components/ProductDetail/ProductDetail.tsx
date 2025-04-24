@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import AddCartBtn from "../addCartbtn/addCartbtn";
 
 type Product = {
     id: string;
@@ -12,7 +13,7 @@ type Product = {
     category: string;
 };
 
-export const ProductDetail = ({ product }: { product: Product }) => {
+export const   ProductDetail = ({ product }: { product: Product }) => {
     
     const [quantity, setQuantity] = React.useState(1);
 
@@ -89,12 +90,13 @@ export const ProductDetail = ({ product }: { product: Product }) => {
 
                         {/* Actions: Add to Cart, Go Back */}
                         <div className="flex space-x-4 mt-6">
-                            <button className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-300 cursor-pointer">
-                                Add to Cart
-                            </button>
+
+                            <AddCartBtn   product={product} />
+                      
+                          
                             <button
                                 onClick={() => window.history.back()}
-                                className="px-6 py-2 border border-gray-300 text-gray-800 rounded-lg hover:bg-gray-100 transition-all duration-300 cursor-pointer">
+                                className="px-6 py-1  border border-gray-300 text-gray-800 rounded-lg hover:bg-gray-100 transition-all duration-300 cursor-pointer">
                                 Go Back
                             </button>
                         </div>
