@@ -3,25 +3,25 @@
 import { useEffect, useState } from 'react';
 
 export default function MonitoringPage() {
-  const [logs, setLogs] = useState([]);
+  // const [logs, setLogs] = useState([]);
 
-  useEffect(() => {
-    const fetchLogs = async () => {
-      const res = await fetch('https://YOUR_PROJECT_ID.supabase.co/rest/v1/logs?order=created_at.desc', {
-        headers: {
-          apikey: 'YOUR_SUPABASE_API_KEY',
-          Authorization: 'Bearer YOUR_SUPABASE_API_KEY',
-        },
-      });
-      const data = await res.json();
-      setLogs(data);
-    };
-    fetchLogs();
-  }, []);
+  // useEffect(() => {
+  //   const fetchLogs = async () => {
+  //     const res = await fetch('https://YOUR_PROJECT_ID.supabase.co/rest/v1/logs?order=created_at.desc', {
+  //       headers: {
+  //         apikey: 'YOUR_SUPABASE_API_KEY',
+  //         Authorization: 'Bearer YOUR_SUPABASE_API_KEY',
+  //       },
+  //     });
+  //     const data = await res.json();
+  //     setLogs(data);
+  //   };
+  //   fetchLogs();
+  // }, []);
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-4">API Error Logs</h1>
+      {/* <h1 className="text-2xl font-bold mb-4">API Error Logs</h1>
       <ul className="space-y-2">
         {logs.map((log: any) => (
           <li key={log.id} className="bg-red-100 p-4 rounded text-sm">
@@ -30,7 +30,9 @@ export default function MonitoringPage() {
             <p><strong>Time:</strong> {new Date(log.created_at).toLocaleString()}</p>
           </li>
         ))}
-      </ul>
+      </ul> */}
+
+      <h1 className=' text-4xl'>this page will be updated!!! </h1>
     </div>
   );
 }

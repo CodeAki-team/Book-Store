@@ -1,5 +1,6 @@
 'use client';
 
+import { supabase } from '@/lib/supabaseClient';
 import { useEffect, useState } from 'react';
 
 export default function ProductListPage() {
@@ -7,13 +8,9 @@ export default function ProductListPage() {
 
   useEffect(() => {
     const fetchBooks = async () => {
-      const res = await fetch('https://qgctoqjyvnmsbjnbhplo.supabase.co/rest/v1/books', {
-        headers: {
-     
-        },
-      });
-      const data = await res.json();
-      setBooks(data);
+        const {data ,error} = await supabase.from("books").select("*")
+      
+      setBooks(data );
     };
     fetchBooks();
   }, []);
