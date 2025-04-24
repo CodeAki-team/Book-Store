@@ -9,19 +9,18 @@ export default function EmailCallbackPage() {
     const [message, setMessage] = useState("Verifying your email...");
 
     useEffect(() => {
-        const verify = async () => {
+        (async () => {
             const { error } = await supabase.auth.getSession();
 
             if (error) {
                 setMessage("Verification failed. Try signing in manually.");
             } else {
                 setMessage("Email confirmed! Redirecting...");
-                setTimeout(() => router.push("/"), 2000); // Redirect after 2s
+                setTimeout(() => router.push("/"), 2000);
             }
-        };
-
-        verify();
+        })();
     }, [router]);
+
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-100">

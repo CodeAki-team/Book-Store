@@ -65,8 +65,8 @@ export default function TopProductsSlider({
             <ChevronLeft size={28} />
           </Button>
 
-          <div className="flex flex-wrap justify-center gap-10 w-full max-w-6xl animate__animated animate__fadeInUp">
-            {currentProducts.map((product, index) => {
+          <div className="flex flex-wrap justify-center gap-20 w-full max-w-6xl animate__animated animate__fadeInUp">
+          {currentProducts.map((product, index) => {
               const globalRank = currentIndex * groupSize + index + 1;
               const rankColor =
                 rankStyles[globalRank as 1 | 2 | 3] || "text-gray-500";
@@ -93,7 +93,7 @@ export default function TopProductsSlider({
                         alt={product.title}
                         width={260}
                         height={200}
-                        className="w-full h-[300px] object-cover rounded-xl mb-4"
+                        className="w-full h-[300px] object-cover rounded-xl mb-4 cursor-pointer"
                       />
                       <h3 className="text-xl font-bold text-center">
                         {product.title}

@@ -4,8 +4,8 @@ import { supabase } from "./supabaseClient";
 export const getFilters = async () => {
 
   const { data: categoryData, error: categoryError } = await supabase
-    .from("books")
-    .select("category");
+      .from("books")
+      .select("category");
 
   if (categoryError) throw categoryError;
 
@@ -15,8 +15,8 @@ export const getFilters = async () => {
 
 
   const { data: statsData, error: statsError } = await supabase
-    .from("books")
-    .select("price, rating");
+      .from("books")
+      .select("price, rating");
 
   if (statsError) throw statsError;
 
