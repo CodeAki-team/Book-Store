@@ -58,9 +58,9 @@ export default function MonitoringPage() {
   const errorLogs = logs.filter((log) => log.status_code >= 400).length;
 
   const getChartColor = () => {
-    if (errorLogs === 0) return '#34d399'; // سبز
-    if (errorLogs === totalLogs) return '#f87171'; // قرمز
-    return '#fbbf24'; // زرد برای ترکیب
+    if (errorLogs === 0) return '#34d399';
+    if (errorLogs === totalLogs) return '#f87171';
+    return '#fbbf24'; 
   };
 
   return (

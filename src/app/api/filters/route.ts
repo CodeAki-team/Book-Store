@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
   try {
     const filters = await getFilters();
 
-    // 📦 ثبت درخواست موفق
+
     await supabase.from("logs").insert([
       {
         endpoint,
@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
   } catch (error: any) {
     console.error("Error fetching filters:", error);
 
-    // 🧯 ثبت خطا
+
     await supabase.from("logs").insert([
       {
         endpoint,

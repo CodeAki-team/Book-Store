@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { supabase } from '@/lib/supabaseClient'; // حواست باشه مسیر درست باشه
+import { supabase } from '@/lib/supabaseClient'; 
 
 export default function AddBookPage() {
   const [form, setForm] = useState({
@@ -17,8 +17,8 @@ export default function AddBookPage() {
     rating: '',
     description: '',
     image: null as File | null,
-    category: '', // تغییر داده شد از categoryId به category
-    extraField: '' // فیلد جدید برای ورودی آزاد
+    category: '', 
+    extraField: ''
   });
 
   const [error, setError] = useState('');
@@ -87,7 +87,7 @@ export default function AddBookPage() {
           rating: Number(form.rating),
           description: form.description,
           image: publicUrl,
-          category: form.category, // استفاده از category به جای categoryId
+          category: form.category, 
         });
 
       if (insertError) throw new Error(`Book insert failed: ${insertError.message}`);
@@ -116,7 +116,7 @@ export default function AddBookPage() {
           <Input name="rating" placeholder="Rating (0-5)" onChange={handleChange} />
           <Textarea name="description" placeholder="Description" onChange={handleChange} />
           
-          {/* Input برای دسته‌بندی (category) به‌جای select */}
+          
           <Input name="category" placeholder="Category" onChange={handleChange} />
 
           <Input type="file" accept="image/*" onChange={handleFileChange} />

@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
   try {
     const products = await getProducts(query);
 
-    // ✅ ثبت موفقیت
+
     await supabase.from("logs").insert({
       endpoint: "/api/products",
       message,
@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
     statusCode = 500;
     message = error.message || "Unknown error";
 
-    // ❌ ثبت خطا
+    
     await supabase.from("logs").insert({
       endpoint: "/api/products",
       message,
