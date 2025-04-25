@@ -1,7 +1,8 @@
+"use client"
 import { useState } from 'react';
 import { Button } from '../ui/button';
 import { ShoppingCart } from 'lucide-react';
-import { useSmartCart } from '@/hooks/useSmartCart';
+import { useNotification } from '@/components/Context/NotificationContext';
 import { supabase } from '@/lib/supabaseClient';
 import { useLocalCartStore } from '@/hooks/useLocalCartStore';
 
@@ -20,8 +21,7 @@ const AddCartBtn = ({ product }: Props) => {
     const [isAdding, setIsAdding] = useState(false);
     const { items, updateQuantity, addToLocalCart } = useLocalCartStore();
     const item = items.find((i) => i.book_id === product.id);
-    const { addItem: addSmartCartItem } = useSmartCart();
-
+    const { notify } = useNotification();
     const addToSupabase = async (productId: string, quantity: number) => {
         const { data: { session } } = await supabase.auth.getSession();
         const user = session?.user;
@@ -39,9 +39,10 @@ const AddCartBtn = ({ product }: Props) => {
                     onConflict: 'user_id,book_id'
                 });
 
-            if (error) {
-                console.error("Error adding to cart in Supabase:", error.message);
-            }
+                if (error) {
+                    console.error("Error adding to cart in Supabase:", error.message);
+                    notify(`Failed to update cart: ${error.message}`, 'error'); 
+                }
         }
     };
 
@@ -54,15 +55,16 @@ const AddCartBtn = ({ product }: Props) => {
             quantity: quantity,
             image: product.image,
         };
-
+    
         if (!item) {
-            addToLocalCart(cartItem);
+            debugger
             const currentCart = JSON.parse(localStorage.getItem('cart') || '[]');
             const updatedCart = [...currentCart, cartItem];
             localStorage.setItem('cart', JSON.stringify(updatedCart));
         }
-
+    
         addToSupabase(product.id, quantity);
+        notify(`${product.title} added to cart!`, 'success'); 
         setIsAdding(true);
     };
 
@@ -70,9 +72,11 @@ const AddCartBtn = ({ product }: Props) => {
         if (item) {
             updateQuantity(item.book_id, quantity);
             addToSupabase(product.id, quantity);
+            notify(`${product.title} updated in cart.`, 'info');
         }
         setIsAdding(false);
     };
+    
 
     const increment = () => {
         if (quantity < product.stock) {

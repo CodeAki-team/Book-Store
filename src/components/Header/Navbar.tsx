@@ -17,12 +17,16 @@ const Navbar = () => {
     const [isSearchVisible, setIsSearchVisible] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
     const [searchResults, setSearchResults] = useState<any[]>([]);
+
+
+
     const [user, setUser] = useState<any>(null); 
+
     const router = useRouter();
 
     const handleSignOut = async () => {
         await supabase.auth.signOut();
-        setUser(null); // Update state after sign out
+        setUser(null); 
         router.push("/");
     };
 
@@ -38,12 +42,12 @@ const Navbar = () => {
                 console.error("Error fetching books:", error.message);
             } else {
                 setSearchResults(data);
-                window.scrollTo({ top: 0, behavior: "smooth" }); // 👈 Scroll to top
+                window.scrollTo({ top: 0, behavior: "smooth" }); 
             }
         }
     };
 
-    // Check user session on mount
+
     useEffect(() => {
         const checkSession = async () => {
             const { data: { session }, error } = await supabase.auth.getSession();
@@ -61,7 +65,7 @@ const Navbar = () => {
 
         checkSession();
 
-        // Optionally, listen to auth state changes
+   
         const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
             if (session) {
                 setUser(session.user);
@@ -70,7 +74,7 @@ const Navbar = () => {
             }
         });
 
-        // Clean up the subscription on unmount
+    
         return () => {
             subscription?.unsubscribe();
         };
