@@ -14,7 +14,9 @@ export default function EditProductPage() {
   const [book, setBook] = useState({
     title: '',
     author: '',
+    category:'',
     price: '',
+    rating:'',
     stock: '', 
   });
   const [error, setError] = useState('');
@@ -85,6 +87,15 @@ export default function EditProductPage() {
           />
         </div>
         <div>
+          <label className="block">category</label>
+          <input 
+            type="text"
+            className="w-full p-2 border"
+            value={book.category}
+            onChange={e => setBook({ ...book, category: e.target.value })}
+          />
+        </div>
+        <div>
           <label className="block">Price</label>
           <input 
             type="number"
@@ -100,6 +111,15 @@ export default function EditProductPage() {
             className="w-full p-2 border"
             value={book.stock}
             onChange={e => setBook({ ...book, stock: e.target.value })}
+          />
+        </div>
+        <div>
+          <label className="block">rating</label>
+          <input 
+            type="number"
+            className="w-full p-2 border"
+            value={book.rating}
+            onChange={e => setBook({ ...book, rating: e.target.value })}
           />
         </div>
         <button 

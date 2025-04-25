@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -17,6 +17,8 @@ export default function AddBookPage() {
     rating: '',
     description: '',
     image: null as File | null,
+    category: '', // تغییر داده شد از categoryId به category
+    extraField: '' // فیلد جدید برای ورودی آزاد
   });
 
   const [error, setError] = useState('');
@@ -31,11 +33,10 @@ export default function AddBookPage() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
     setForm(prev => ({ ...prev, image: file }));
-  
   };
 
   const validateForm = () => {
-    if (!form.title || !form.author || !form.price || !form.stock || !form.rating || !form.description || !form.image) {
+    if (!form.title || !form.author || !form.price || !form.stock || !form.rating || !form.description || !form.image || !form.category) {
       setError('All fields are required.');
       return false;
     }
@@ -49,34 +50,32 @@ export default function AddBookPage() {
     }
     return true;
   };
-  console.log(form.image)
+
   const handleSubmit = async () => {
     setError('');
     if (!validateForm()) return;
     setLoading(true);
-  
+
     try {
       const fileExt = form.image!.name.split('.').pop();
       const fileName = `${Date.now()}.${fileExt}`;
       const filePath = `image/${fileName}`;
-  
+
       // 1. Upload image
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from('books-image')
         .upload(filePath, form.image!);
-  
+
       if (uploadError){
         console.log('uploadError', uploadError);
-
-        
         throw new Error(`Image upload failed: ${uploadError.message}`);
       }
       const { data: publicData } = supabase.storage
         .from('books-image')
         .getPublicUrl(filePath);
-  
+
       const publicUrl = publicData?.publicUrl;
-  
+
       // 2. Insert book with Supabase SDK
       const { error: insertError } = await supabase
         .from('books')
@@ -88,10 +87,11 @@ export default function AddBookPage() {
           rating: Number(form.rating),
           description: form.description,
           image: publicUrl,
+          category: form.category, // استفاده از category به جای categoryId
         });
-  
+
       if (insertError) throw new Error(`Book insert failed: ${insertError.message}`);
-  
+
       router.push('/admin/products');
     } catch (err: any) {
       console.error(err);
@@ -100,8 +100,6 @@ export default function AddBookPage() {
       setLoading(false);
     }
   };
-  
-  
 
   return (
     <div className="max-w-2xl mx-auto mt-8">
@@ -117,6 +115,10 @@ export default function AddBookPage() {
           <Input name="stock" placeholder="Stock" onChange={handleChange} />
           <Input name="rating" placeholder="Rating (0-5)" onChange={handleChange} />
           <Textarea name="description" placeholder="Description" onChange={handleChange} />
+          
+          {/* Input برای دسته‌بندی (category) به‌جای select */}
+          <Input name="category" placeholder="Category" onChange={handleChange} />
+
           <Input type="file" accept="image/*" onChange={handleFileChange} />
 
           <Button onClick={handleSubmit} disabled={loading}>

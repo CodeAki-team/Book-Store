@@ -3,22 +3,22 @@ import { ReactNode } from "react";
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex flex-col md:flex-row">
       {/* Sidebar */}
-      <aside className="w-64 bg-gray-900 text-white p-6 space-y-4">
-        <h2 className="text-xl font-bold">Admin Dashboard</h2>
+      <aside className="md:w-64 w-full bg-gray-900 text-white p-6 space-y-4">
+        <h2 className="text-2xl font-bold">Admin Dashboard</h2>
         <nav className="space-y-2">
-          <Link href="/admin" className="block hover:underline">
-            Dashboard Home
+          <Link href="/admin" className="block hover:text-green-300 transition">
+            🏠 Dashboard Home
           </Link>
-          <Link href="/admin/products" className="block hover:underline">
-            Products
+          <Link href="/admin/products" className="block hover:text-green-300 transition">
+            📦 Products
           </Link>
-          <Link href="/admin/products/new" className="block hover:underline">
-            Add Product
+          <Link href="/admin/products/new" className="block hover:text-green-300 transition">
+            ➕ Add Product
           </Link>
-          <Link href="/admin/monitoring" className="block hover:underline">
-            Error Monitoring
+          <Link href="/admin/monitoring" className="block hover:text-green-300 transition">
+            📈 Error Monitoring
           </Link>
         </nav>
       </aside>
