@@ -6,7 +6,7 @@ import React from "react";
 export const dynamic = "force-static";
 
 interface PageProps {
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
 interface Product {
@@ -20,28 +20,31 @@ interface Product {
 }
 
 async function Productpage({ searchParams }: PageProps) {
+  // Await the searchParams since it is a Promise
+  const _searchParams = await searchParams;
+
   const query = new URLSearchParams();
 
   // Handle filters from URL params
-  if (searchParams.category) {
-    const categories = Array.isArray(searchParams.category)
-        ? searchParams.category
-        : [searchParams.category];
+  if (_searchParams.category) {
+    const categories = Array.isArray(_searchParams.category)
+        ? _searchParams.category
+        : [_searchParams.category];
     categories.forEach((cat) => query.append("category", cat));
   }
 
-  if (searchParams.minPrice) query.set("minPrice", String(searchParams.minPrice));
-  if (searchParams.maxPrice) query.set("maxPrice", String(searchParams.maxPrice));
-  if (searchParams.rating) query.set("rating", String(searchParams.rating));
-  if (searchParams.inStock) query.set("inStock", String(searchParams.inStock));
-  if (searchParams.sort) query.set("sort", String(searchParams.sort));
+  if (_searchParams.minPrice) query.set("minPrice", String(_searchParams.minPrice));
+  if (_searchParams.maxPrice) query.set("maxPrice", String(_searchParams.maxPrice));
+  if (_searchParams.rating) query.set("rating", String(_searchParams.rating));
+  if (_searchParams.inStock) query.set("inStock", String(_searchParams.inStock));
+  if (_searchParams.sort) query.set("sort", String(_searchParams.sort));
 
-  
+  // Fetch filters
   const filters = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/api/filters`, {
     cache: "force-cache",
   }).then((res) => res.json());
 
-  
+  // Fetch products based on the constructed query
   const products: Product[] = await fetch(
       `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/api/products?${query.toString()}`,
       {

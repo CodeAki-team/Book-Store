@@ -2,22 +2,26 @@ import { supabase } from "@/lib/supabaseClient";
 import { notFound } from "next/navigation";
 import { ProductDetail } from "@/components/ProductDetail/ProductDetail";
 
-interface Props {
-    params: {
-        id: string;
-    };
+interface PageProps {
+    params: Promise<{ id: string }>;
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
-export default async function ProductDetailPage({ params }: Props) {
+export default async function ProductDetailPage({ params, searchParams }: PageProps) {
+    const { id } = await params;
+    const _searchParams = await searchParams; // If you need it
+
+    // Fetch the product
     const { data: product, error } = await supabase
         .from("books")
         .select("*")
-        .eq("id", params.id)
+        .eq("id", id)
         .single();
 
     if (!product || error) {
-        return notFound();
+        notFound();
     }
-    
+
     return <ProductDetail product={product} />;
 }
+

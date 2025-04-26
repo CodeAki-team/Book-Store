@@ -72,6 +72,7 @@ const ProductList = ({ products }: ProductListProps) => {
                                         alt={product.title}
                                         width={200}
                                         height={250}
+                                        priority
                                         className="object-contain h-full"
                                     />
                                 </div>
