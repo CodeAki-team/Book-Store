@@ -1,11 +1,7 @@
 "use client";
 
-import React, { useState, useEffect, useTransition } from "react";
-import {
-  useRouter,
-  usePathname,
-  useSearchParams,
-} from "next/navigation";
+import React, { useState, useEffect, useTransition, useMemo } from "react";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
@@ -37,27 +33,37 @@ const ProductFilter = ({ filters }: FilterProps) => {
   const [, startTransition] = useTransition();
 
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [priceRange, setPriceRange] = useState([
+  const [priceRange, setPriceRange] = useState<[number, number]>([
     filters.minPrice,
     filters.maxPrice,
   ]);
   const [rating, setRating] = useState(0);
   const [inStockOnly, setInStockOnly] = useState(false);
 
+  const unwrappedSearchParams = useMemo(() => {
+    return {
+      category: searchParams.getAll("category"),
+      minPrice: searchParams.get("minPrice"),
+      maxPrice: searchParams.get("maxPrice"),
+      rating: searchParams.get("rating"),
+      inStock: searchParams.get("inStock"),
+    };
+  }, [searchParams]);
+
   useEffect(() => {
-    const categoriesFromUrl = searchParams.getAll("category");
+    const categoriesFromUrl = unwrappedSearchParams.category || [];
     const minPriceFromUrl =
-        Number(searchParams.get("minPrice")) || filters.minPrice;
+        Number(unwrappedSearchParams.minPrice) || filters.minPrice;
     const maxPriceFromUrl =
-        Number(searchParams.get("maxPrice")) || filters.maxPrice;
-    const ratingFromUrl = Number(searchParams.get("rating")) || 0;
-    const stockFromUrl = searchParams.get("inStock") === "true";
+        Number(unwrappedSearchParams.maxPrice) || filters.maxPrice;
+    const ratingFromUrl = Number(unwrappedSearchParams.rating) || 0;
+    const stockFromUrl = unwrappedSearchParams.inStock === "true";
 
     setSelectedCategories(categoriesFromUrl);
     setPriceRange([minPriceFromUrl, maxPriceFromUrl]);
     setRating(ratingFromUrl);
     setInStockOnly(stockFromUrl);
-  }, [searchParams, filters]);
+  }, [unwrappedSearchParams, filters]);
 
   const handleResetFilters = () => {
     setSelectedCategories([]);
@@ -69,10 +75,7 @@ const ProductFilter = ({ filters }: FilterProps) => {
     });
   };
 
-  const handleCategoryChange = (
-      category: string,
-      checked: boolean | "indeterminate"
-  ) => {
+  const handleCategoryChange = (category: string, checked: boolean | "indeterminate") => {
     if (checked === "indeterminate") return;
     setSelectedCategories((prev) =>
         checked ? [...prev, category] : prev.filter((c) => c !== category)
@@ -95,8 +98,7 @@ const ProductFilter = ({ filters }: FilterProps) => {
   const getActiveFilterCount = () => {
     let count = 0;
     if (selectedCategories.length > 0) count += selectedCategories.length;
-    if (priceRange[0] !== filters.minPrice || priceRange[1] !== filters.maxPrice)
-      count += 1;
+    if (priceRange[0] !== filters.minPrice || priceRange[1] !== filters.maxPrice) count += 1;
     if (rating > 0) count += 1;
     if (inStockOnly) count += 1;
     return count;
@@ -133,7 +135,10 @@ const ProductFilter = ({ filters }: FilterProps) => {
               <Label className="font-bold mb-2 block text-xl">Category</Label>
               <div className="space-y-2">
                 {filters.categories.map((category) => (
-                    <div key={category} className="flex items-center space-x-2 cursor-pointer">
+                    <div
+                        key={category}
+                        className="flex items-center space-x-2 cursor-pointer"
+                    >
                       <Checkbox
                           id={category}
                           checked={selectedCategories.includes(category)}
@@ -157,7 +162,7 @@ const ProductFilter = ({ filters }: FilterProps) => {
                   max={filters.maxPrice}
                   step={1}
                   value={priceRange}
-                  onValueChange={setPriceRange}
+                  onValueChange={(value) => setPriceRange([value[0], value[1]])}
                   className="cursor-pointer"
               />
               <div className="text-sm mt-2 text-muted-foreground">
@@ -178,10 +183,7 @@ const ProductFilter = ({ filters }: FilterProps) => {
                             rating >= star ? "text-yellow-400" : "text-gray-300"
                         }`}
                     >
-                      <Star
-                          size={20}
-                          fill={rating >= star ? "#facc15" : "none"}
-                      />
+                      <Star size={20} fill={rating >= star ? "#facc15" : "none"} />
                     </button>
                 ))}
               </div>
