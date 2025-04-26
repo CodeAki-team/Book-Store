@@ -61,7 +61,7 @@ const SignUpForm = () => {
                 .from("users")
                 .select("id")
                 .eq("email", email)
-                .single();
+                .maybeSingle();
 
             if (emailCheckError && emailCheckError.code !== "GRIST116") {
                 setErrorMessage(emailCheckError.message);
