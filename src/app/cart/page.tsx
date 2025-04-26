@@ -1,6 +1,8 @@
 "use client";
-import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabaseClient';
+
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabaseClient";
+import Link from "next/link";
 
 type Book = {
     id: number;
@@ -14,114 +16,83 @@ type CartItem = {
     book_id: number;
     quantity: number;
     book?: Book;
-    books?: Book;
 };
 
 const Cart = () => {
     const [cartItems, setCartItems] = useState<CartItem[]>([]);
+    const [books, setBooks] = useState<Book[]>([]);
     const [error, setError] = useState<string | null>(null);
 
-    // const addItemToCart = async (bookId: number, quantity: number) => {
-    //     try {
-    //         const userRes = await supabase.auth.getUser();
-    //         const user = userRes.data?.user;
-
-    //         if (!user) {
-    //             const guestCart = JSON.parse(localStorage.getItem('cart') || '[]');
-    //             const existingItem = guestCart.find((item: CartItem) => item.book_id === bookId);
-
-    //             if (existingItem) {
-    //                 existingItem.quantity += quantity;
-    //             } else {
-    //                 guestCart.push({ book_id: bookId, quantity });
-    //             }
-
-    //             localStorage.setItem('guest_cart', JSON.stringify(guestCart));
-    //             setCartItems(guestCart);
-    //         } else {
-    //             const { data, error } = await supabase
-    //                 .from('cart')
-    //                 .upsert({ user_id: user.id, book_id: bookId, quantity });
-
-    //             if (error) {
-    //                 setError('Failed to add item to your cart.');
-    //                 console.error('Error adding item to cart:', error);
-    //                 return;
-    //             }
-
-    //             const { data: updatedCart, error: fetchError } = await supabase
-    //                 .from('cart')
-    //                 .select('*, books(*)')
-    //                 .eq('user_id', user.id);
-
-    //             if (fetchError) {
-    //                 setError('Failed to load updated cart.');
-    //                 console.error('Error fetching updated cart data:', fetchError);
-    //                 return;
-    //             }
-
-    //             setCartItems(updatedCart || []);
-    //         }
-    //     } catch (err) {
-    //         console.error('Error adding item to cart:', err);
-    //         setError('Failed to add item to the cart.');
-    //     }
-    // };
-
     useEffect(() => {
-        const loadCart = async () => {
+        const loadCartData = async () => {
             try {
                 const userRes = await supabase.auth.getUser();
                 const user = userRes.data?.user;
 
+                let cartData: CartItem[] = [];
+
                 if (!user) {
-                    const guestCart = JSON.parse(localStorage.getItem('cart') || '[]');
-                    console.log(guestCart)
-                    if (guestCart.length === 0) {
-                        setCartItems([]);
-                        return;
+                    const guestCartRaw = localStorage.getItem("cart");
+                    let guestCart: CartItem[] = [];
+
+                    try {
+                        guestCart = guestCartRaw ? JSON.parse(guestCartRaw) : [];
+                    } catch {
+                        guestCart = [];
+                        localStorage.removeItem("cart");
                     }
 
-                    const bookIds = guestCart.map((item: CartItem) => item.book_id);
-                    const { data: booksData, error: booksError } = await supabase
-                        .from('books')
-                        .select('*')
-                        .in('id', bookIds);
-
-                    if (booksError) {
-                        setError('Failed to load books from the database.');
-                        console.error('Error fetching books:', booksError);
-                        return;
-                    }
-
-                    const merged = guestCart.map((item: CartItem) => {
-                        const book = booksData.find((b) => b.id === item.book_id);
-                        return { ...item, book };
+                    const uniqueMap = new Map<number, CartItem>();
+                    guestCart.forEach((item) => {
+                        if (uniqueMap.has(item.book_id)) {
+                            uniqueMap.get(item.book_id)!.quantity += item.quantity;
+                        } else {
+                            uniqueMap.set(item.book_id, { ...item });
+                        }
                     });
 
-                    setCartItems(merged);
+                    cartData = Array.from(uniqueMap.values());
+                    localStorage.setItem("cart", JSON.stringify(cartData));
                 } else {
                     const { data, error: cartError } = await supabase
-                        .from('cart')
-                        .select('*, books(*)')
-                        .eq('user_id', user.id);
+                        .from("cart")
+                        .select("book_id, quantity")
+                        .eq("user_id", user.id);
 
                     if (cartError) {
-                        setError('Failed to load your cart.');
-                        console.error('Error fetching cart data:', cartError);
+                        setError("Failed to load your cart.");
+                        console.error("Error fetching cart data:", cartError);
                         return;
                     }
-                    setCartItems(data || []);
+
+                    cartData = data || [];
                 }
+
+                const { data: booksData, error: booksError } = await supabase
+                    .from("books")
+                    .select("id, title, image, price, stock");
+
+                if (booksError) {
+                    setError("Failed to load book data.");
+                    console.error("Error fetching books:", booksError);
+                    return;
+                }
+
+                setBooks(booksData || []);
+
+                const cartItemsWithBooks = cartData.map((item) => {
+                    const book = booksData?.find((b) => b.id === item.book_id);
+                    return { ...item, book };
+                });
+
+                setCartItems(cartItemsWithBooks);
             } catch (err: any) {
-                console.error('Error loading cart:', err.message);
-                setError('Failed to load cart.');
+                console.error("Error loading cart:", err.message);
+                setError("Failed to load cart.");
             }
         };
 
-        loadCart().catch((err) => {
-            console.error('Error in loadCart promise:', err);
-        });
+        loadCartData();
     }, []);
 
     const removeItem = async (bookId: number) => {
@@ -130,123 +101,128 @@ const Cart = () => {
             const user = userRes.data?.user;
 
             if (!user) {
-                const guestCart = JSON.parse(localStorage.getItem('cart') || '[]');
+                const guestCart = JSON.parse(localStorage.getItem("cart") || "[]");
                 const updated = guestCart.filter((item: CartItem) => item.book_id !== bookId);
-                localStorage.setItem('cart', JSON.stringify(updated));
-                setCartItems(updated);
+                localStorage.setItem("cart", JSON.stringify(updated));
+                setCartItems(
+                    updated.map((item: CartItem) => ({
+                        ...item,
+                        book: books.find((b) => b.id === item.book_id),
+                    }))
+                );
             } else {
-                const { error } = await supabase.from('cart').delete().eq('user_id', user.id).eq('book_id', bookId);
+                const { error } = await supabase
+                    .from("cart")
+                    .delete()
+                    .eq("user_id", user.id)
+                    .eq("book_id", bookId);
+
                 if (error) {
-                    setError('Failed to remove item from your cart.');
-                    console.error('Error removing item from cart:', error);
+                    setError("Failed to remove item from your cart.");
+                    console.error("Error removing item from cart:", error);
                     return;
                 }
-                setCartItems(cartItems.filter((item) => item.book_id !== bookId));
+
+                const updatedCart = cartItems.filter((item) => item.book_id !== bookId);
+                setCartItems(updatedCart);
             }
         } catch (err) {
-            console.error('Error removing item:', err);
-            setError('Failed to remove item.');
+            console.error("Error removing item:", err);
+            setError("Failed to remove item.");
         }
     };
 
     const calculateTotal = () =>
         cartItems.reduce((sum, item) => {
-            const book = item.book || item.books;
+            const book = item.book;
             if (!book) return sum;
             return sum + book.price * item.quantity;
         }, 0);
 
     const hasStockError = cartItems.some((item) => {
-        const book = item.book || item.books;
+        const book = item.book;
         return book ? item.quantity > book.stock : false;
     });
 
     return (
-        <div className="container mx-auto p-6 bg-gray-50 rounded-lg shadow-lg">
-            <h1 className="text-3xl font-bold text-center mb-6">Your Cart</h1>
+        <div className="container mx-auto p-4 sm:p-6 bg-gray-50 rounded-lg shadow-lg">
+            <h1 className="text-2xl sm:text-3xl font-bold text-center mb-6">Your Cart</h1>
             {error && <p className="text-red-500 text-center">{error}</p>}
 
-            <div className="overflow-x-auto">
-                <table className="min-w-full table-auto bg-white shadow-md rounded-lg">
-                    <thead className="bg-gray-800 text-white">
-                    <tr>
-                        <th className="px-6 py-3 text-left">Image</th>
-                        <th className="px-6 py-3 text-left">Title</th>
-                        <th className="px-6 py-3 text-left">Price</th>
-                        <th className="px-6 py-3 text-left">Quantity</th>
-                        <th className="px-6 py-3 text-left">Total</th>
-                        <th className="px-6 py-3 text-left">Status</th>
-                        <th className="px-6 py-3 text-left">Action</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {cartItems.length > 0 ? (
-                        cartItems.map((item) => {
-                            const book = item.book || item.books;
-                            if (!book) return null;
+            <div className="space-y-4">
+                {cartItems.length > 0 ? (
+                    cartItems.map((item) => {
+                        const book = item.book;
+                        if (!book) return null;
 
-                            const outOfStock = item.quantity > book.stock;
+                        const outOfStock = item.quantity > book.stock;
 
-                            return (
-                                <tr key={item.book_id} className="border-b hover:bg-gray-50">
-                                    <td className="px-6 py-4">
-                                        <img
-                                            src={book.image}
-                                            alt={book.title}
-                                            className="w-20 h-20 object-cover rounded-md"
-                                        />
-                                    </td>
-                                    <td className="px-6 py-4">{book.title}</td>
-                                    <td className="px-6 py-4">${book.price.toFixed(2)}</td>
-                                    <td className="px-6 py-4">{item.quantity}</td>
-                                    <td className="px-6 py-4">
-                                        ${(book.price * item.quantity).toFixed(2)}
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        {outOfStock ? (
-                                            <span className="bg-red-500 text-white px-3 py-1 rounded-full text-sm">
-                                                    Out of Stock
-                                                </span>
-                                        ) : (
-                                            <span className="bg-green-500 text-white px-3 py-1 rounded-full text-sm">
-                                                    In Stock
-                                                </span>
-                                        )}
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        <button
-                                            onClick={() => removeItem(item.book_id)}
-                                            className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition cursor-pointer"
+                        return (
+                            <div
+                                key={item.book_id}
+                                className="flex flex-col sm:flex-row sm:items-center gap-4 p-4 bg-white rounded-lg shadow-sm"
+                            >
+                                <img
+                                    src={book.image}
+                                    alt={book.title}
+                                    className="w-24 h-24 object-cover rounded-md self-center sm:self-start"
+                                />
+                                <div className="flex-1">
+                                    <h2 className="text-lg font-semibold text-center sm:text-left">
+                                        {book.title}
+                                    </h2>
+                                    <p className="text-gray-600 text-center sm:text-left">
+                                        Price: ${book.price.toFixed(2)}
+                                    </p>
+                                    <p className="text-gray-600 text-center sm:text-left">
+                                        Quantity: {item.quantity}
+                                    </p>
+                                    <p className="text-gray-800 font-semibold text-center sm:text-left mt-1">
+                                        Total: ${(book.price * item.quantity).toFixed(2)}
+                                    </p>
+                                    <div className="mt-2 flex justify-center sm:justify-start">
+                                        <span
+                                            className={`px-3 py-1 rounded-full text-sm ${
+                                                outOfStock
+                                                    ? "bg-red-500 text-white"
+                                                    : "bg-green-500 text-white"
+                                            }`}
                                         >
-                                            Remove
-                                        </button>
-                                    </td>
-                                </tr>
-                            );
-                        })
-                    ) : (
-                        <tr>
-                            <td colSpan={7} className="text-center py-6 text-gray-500">
-                                Your cart is empty.
-                            </td>
-                        </tr>
-                    )}
-                    </tbody>
-                </table>
+                                            {outOfStock ? "Out of Stock" : "In Stock"}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div className="flex justify-center sm:justify-end">
+                                    <button
+                                        onClick={() => removeItem(item.book_id)}
+                                        className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition cursor-pointer"
+                                    >
+                                        Remove
+                                    </button>
+                                </div>
+                            </div>
+                        );
+                    })
+                ) : (
+                    <p className="text-center text-gray-500">Your cart is empty.</p>
+                )}
             </div>
 
             {cartItems.length > 0 && (
-                <div className="flex justify-between items-center mt-6">
+                <div className="flex flex-col sm:flex-row justify-between items-center mt-6 gap-4">
                     <div className="text-xl font-bold">
                         Total: ${calculateTotal().toFixed(2)}
                     </div>
-                    <div className="flex gap-4">
-                        <button className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 cursor-pointer">
-                            Continue Shopping
-                        </button>
+                    <div className="flex gap-3 flex-col sm:flex-row w-full sm:w-auto">
+                        <Link href="/products" className="w-full sm:w-auto">
+                            <button className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 w-full cursor-pointer">
+                                Continue Shopping
+                            </button>
+                        </Link>
+
                         <button
                             disabled={hasStockError}
-                            className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 disabled:opacity-50 cursor-pointer"
+                            className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 disabled:opacity-50 w-full sm:w-auto cursor-pointer"
                         >
                             Proceed to Checkout
                         </button>
@@ -258,4 +234,3 @@ const Cart = () => {
 };
 
 export default Cart;
-

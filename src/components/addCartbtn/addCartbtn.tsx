@@ -1,6 +1,5 @@
-"use client"
 import { useState } from 'react';
-import { Button } from '../ui/button';
+import { Button } from '../../components/ui/button';
 import { ShoppingCart } from 'lucide-react';
 import { useNotification } from '@/components/Context/NotificationContext';
 import { supabase } from '@/lib/supabaseClient';
@@ -14,14 +13,15 @@ type Props = {
         price: number;
         stock: number;
     };
+    className?: string;
 };
 
-const AddCartBtn = ({ product }: Props) => {
+const AddCartBtn = ({ product, className }: Props) => {
     const [quantity, setQuantity] = useState(1);
     const [isAdding, setIsAdding] = useState(false);
-    const { items, updateQuantity, addToLocalCart } = useLocalCartStore();
-    const item = items.find((i) => i.book_id === product.id);
+    const { items, updateQuantity } = useLocalCartStore();
     const { notify } = useNotification();
+
     const addToSupabase = async (productId: string, quantity: number) => {
         const { data: { session } } = await supabase.auth.getSession();
         const user = session?.user;
@@ -29,24 +29,32 @@ const AddCartBtn = ({ product }: Props) => {
         if (user) {
             const { error } = await supabase
                 .from('cart')
-                .upsert([
+                .upsert(
+                    [
+                        {
+                            user_id: user.id,
+                            book_id: productId,
+                            quantity: quantity,
+                        }
+                    ],
                     {
-                        user_id: user.id,
-                        book_id: productId,
-                        quantity: quantity,
+                        onConflict: 'user_id,book_id'
                     }
-                ], {
-                    onConflict: 'user_id,book_id'
-                });
+                );
 
-                if (error) {
-                    console.error("Error adding to cart in Supabase:", error.message);
-                    notify(`Failed to update cart: ${error.message}`, 'error'); 
-                }
+            if (error) {
+                console.error("Error adding to cart in Supabase:", error.message);
+                notify(`Failed to update cart: ${error.message}`, 'error');
+            }
         }
     };
 
-    const handleAdd = () => {
+    const handleAddOrUpdate = () => {
+        if (!product) {
+            notify("Product information is missing", 'error');
+            return;
+        }
+
         const cartItem = {
             id: product.id,
             book_id: product.id,
@@ -55,31 +63,31 @@ const AddCartBtn = ({ product }: Props) => {
             quantity: quantity,
             image: product.image,
         };
-    
-        if (!item) {
-            debugger
-            const currentCart = JSON.parse(localStorage.getItem('cart') || '[]');
-            const updatedCart = [...currentCart, cartItem];
+
+        const currentCart = JSON.parse(localStorage.getItem('cart') || '[]');
+        const existingCartItem = currentCart.find((item: any) => item.book_id === product.id);
+
+        if (!existingCartItem) {
+            currentCart.push(cartItem);
+            localStorage.setItem('cart', JSON.stringify(currentCart));
+            addToSupabase(product.id, quantity);
+            notify(`${product.title} added to cart!`, 'success');
+        } else {
+            const updatedCart = currentCart.map((item: any) =>
+                item.book_id === product.id
+                    ? { ...item, quantity: item.quantity + quantity }
+                    : item
+            );
             localStorage.setItem('cart', JSON.stringify(updatedCart));
+            addToSupabase(product.id, existingCartItem.quantity + quantity);
+            notify(`${product.title} updated in cart!`, 'info');
         }
-    
-        addToSupabase(product.id, quantity);
-        notify(`${product.title} added to cart!`, 'success'); 
+
         setIsAdding(true);
     };
 
-    const handleUpdate = () => {
-        if (item) {
-            updateQuantity(item.book_id, quantity);
-            addToSupabase(product.id, quantity);
-            notify(`${product.title} updated in cart.`, 'info');
-        }
-        setIsAdding(false);
-    };
-    
-
     const increment = () => {
-        if (quantity < product.stock) {
+        if (product && quantity < product.stock) {
             setQuantity(quantity + 1);
         }
     };
@@ -90,10 +98,10 @@ const AddCartBtn = ({ product }: Props) => {
         }
     };
 
-    if (product.stock === 0) {
+    if (!product || product.stock === 0) {
         return (
             <Button
-                className="w-full mt-4 bg-gray-400 text-gray-700 font-semibold py-3 rounded-md transition-colors duration-300 ease-in-out cursor-not-allowed"
+                className={`w-full mt-4 bg-gray-400 text-gray-700 font-semibold py-3 rounded-md transition-colors duration-300 ease-in-out cursor-not-allowed ${className}`}
                 disabled
             >
                 Out of Stock
@@ -102,7 +110,7 @@ const AddCartBtn = ({ product }: Props) => {
     }
 
     return (
-        <div className="flex flex-col items-center gap-4">
+        <div className={`flex flex-col items-center gap-4 ${className}`}>
             {isAdding && (
                 <div className="flex items-center gap-2 transition-all duration-300 ease-in-out opacity-100">
                     <Button
@@ -128,15 +136,15 @@ const AddCartBtn = ({ product }: Props) => {
 
             {!isAdding ? (
                 <Button
-                    onClick={handleAdd}
-                    className="w-full mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-md transition-colors duration-300 ease-in-out cursor-pointer"
+                    onClick={handleAddOrUpdate}
+                    className="w-full mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-6 rounded-md transition-colors duration-300 ease-in-out cursor-pointer text-lg"
                 >
                     <ShoppingCart className="mr-2" /> Add to Cart
                 </Button>
             ) : (
                 <Button
-                    onClick={handleUpdate}
-                    className="w-full mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-md transition-colors duration-300 ease-in-out cursor-pointer"
+                    onClick={handleAddOrUpdate}
+                    className="w-full mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-6 rounded-md transition-colors duration-300 ease-in-out cursor-pointer text-lg"
                 >
                     <ShoppingCart className="mr-2" /> Update Cart
                 </Button>

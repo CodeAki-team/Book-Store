@@ -13,18 +13,9 @@ type Product = {
     category: string;
 };
 
-export const   ProductDetail = ({ product }: { product: Product }) => {
-    
+export const ProductDetail = ({ product }: { product: Product }) => {
     const [quantity, setQuantity] = React.useState(1);
 
-    const increaseQuantity = () => {
-        if (quantity < product.stock) setQuantity(quantity + 1);
-    };
-
-    const decreaseQuantity = () => {
-        if (quantity > 1) setQuantity(quantity - 1);
-    };
-    
     const totalPrice = product.price * quantity;
 
     return (
@@ -36,7 +27,7 @@ export const   ProductDetail = ({ product }: { product: Product }) => {
                         <img
                             src={product.image}
                             alt={product.title}
-                            className="w-full h-120 object-cover rounded-xl shadow-lg" 
+                            className="w-full h-120 object-cover rounded-xl shadow-lg"
                         />
                     </div>
 
@@ -64,39 +55,23 @@ export const   ProductDetail = ({ product }: { product: Product }) => {
                             <p className="text-lg text-gray-700">{product.stock} {product.stock > 1 ? 'items' : 'item'} in stock</p>
                         </div>
 
-                        {/* Quantity Selector */}
-                        <div className="flex items-center space-x-4 bg-gray-100 p-4 rounded-lg shadow-md">
-                            <button
-                                onClick={decreaseQuantity}
-                                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-all duration-300 cursor-pointer"
-                                disabled={quantity <= 1}
-                            >
-                                -
-                            </button>
-                            <p className="text-xl font-semibold text-gray-700 cursor-pointer">{quantity}</p>
-                            <button
-                                onClick={increaseQuantity}
-                                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-all duration-300 cursor-pointer"
-                                disabled={quantity >= product.stock}
-                            >
-                                +
-                            </button>
-                        </div>
-
                         {/* Total Price */}
                         <div className="bg-blue-100 p-4 rounded-lg shadow-md mt-4">
                             <p className="text-lg font-semibold text-gray-800">Total: ${totalPrice.toFixed(2)}</p>
                         </div>
 
-                        {/* Actions: Add to Cart, Go Back */}
-                        <div className="flex space-x-4 mt-6">
+                        <div className="mt-6 space-y-4"> {/* Use space-y-4 to give space between buttons vertically */}
+                            {/* Add to Cart Button */}
+                            <AddCartBtn
+                                product={product}
+                                className="px-6 py-2 transition-all duration-300 cursor-pointer text-lg w-full"
+                            />
 
-                            <AddCartBtn   product={product} />
-                      
-                          
+                            {/* Go Back Button */}
                             <button
                                 onClick={() => window.history.back()}
-                                className="px-6 py-1  border border-gray-300 text-gray-800 rounded-lg hover:bg-gray-100 transition-all duration-300 cursor-pointer">
+                                className="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-6 rounded-md transition-colors duration-300 ease-in-out cursor-pointer text-lg w-full"
+                            >
                                 Go Back
                             </button>
                         </div>
