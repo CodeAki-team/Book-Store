@@ -2,6 +2,7 @@ import Filters from "@/components/ProductFilter";
 import ProductList from "@/components/Productlist";
 import Sorting from "@/components/Sorting";
 import React from "react";
+import { headers } from "next/headers";
 
 export const dynamic = "force-static";
 
@@ -19,38 +20,64 @@ interface Product {
   stock: number;
 }
 
-async function Productpage({ searchParams }: PageProps) {
-  // Await the searchParams since it is a Promise
-  const _searchParams = await searchParams;
+export default async function ProductPage({ searchParams }: { searchParams: PageProps["searchParams"] }) {
+  const headersList = await headers();
+  const proto = headersList.get("x-forwarded-proto") ?? "https"; // Default to https
+  const host = headersList.get("host");
+  const baseUrl = host ? `${proto}://${host}` : process.env.NEXT_PUBLIC_BASE_URL;
 
+  if (!baseUrl) {
+    throw new Error("Base URL is not defined. Please check your environment variables or request headers.");
+  }
+
+  const _searchParams = await searchParams;
   const query = new URLSearchParams();
 
   // Handle filters from URL params
-  if (_searchParams.category) {
+  if (_searchParams?.category) {
     const categories = Array.isArray(_searchParams.category)
         ? _searchParams.category
         : [_searchParams.category];
     categories.forEach((cat) => query.append("category", cat));
   }
 
-  if (_searchParams.minPrice) query.set("minPrice", String(_searchParams.minPrice));
-  if (_searchParams.maxPrice) query.set("maxPrice", String(_searchParams.maxPrice));
-  if (_searchParams.rating) query.set("rating", String(_searchParams.rating));
-  if (_searchParams.inStock) query.set("inStock", String(_searchParams.inStock));
-  if (_searchParams.sort) query.set("sort", String(_searchParams.sort));
+  if (_searchParams?.minPrice) query.set("minPrice", String(_searchParams.minPrice));
+  if (_searchParams?.maxPrice) query.set("maxPrice", String(_searchParams.maxPrice));
+  if (_searchParams?.rating) query.set("rating", String(_searchParams.rating));
+  if (_searchParams?.inStock) query.set("inStock", String(_searchParams.inStock));
+  if (_searchParams?.sort) query.set("sort", String(_searchParams.sort));
 
   // Fetch filters
-  const filters = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/api/filters`, {
-    cache: "force-cache",
-  }).then((res) => res.json());
+  let filters = [];
+  try {
+    const res = await fetch(`${baseUrl}/api/filters`, {
+      cache: "force-cache",
+    });
 
-  // Fetch products based on the constructed query
-  const products: Product[] = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/api/products?${query.toString()}`,
-      {
-        next: { revalidate: 60 },
-      }
-  ).then((res) => res.json());
+    if (res.ok) {
+      filters = await res.json();
+    } else {
+      console.error("Failed to fetch filters:", res.statusText);
+    }
+  } catch (error) {
+    console.error("Error fetching filters:", error);
+  }
+
+  // Fetch products
+  let products: Product[] = [];
+  try {
+    const res = await fetch(`${baseUrl}/api/products?${query.toString()}`, {
+      next: { revalidate: 60 },
+    });
+
+    if (res.ok) {
+      products = await res.json();
+    } else {
+      console.error("Failed to fetch products:", res.statusText);
+    }
+  } catch (error) {
+    console.error("Error fetching products:", error);
+  }
 
   return (
       <div className="min-h-screen flex flex-col bg-gradient-to-r from-blue-50 to-blue-100">
@@ -75,5 +102,3 @@ async function Productpage({ searchParams }: PageProps) {
       </div>
   );
 }
-
-export default Productpage;
