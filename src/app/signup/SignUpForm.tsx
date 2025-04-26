@@ -77,7 +77,7 @@ const SignUpForm = () => {
                 email,
                 password,
                 options: {
-                    emailRedirectTo: "http://localhost:3000/auth/callback",
+                    emailRedirectTo: `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/auth/callback}`,
                 },
             });
 
