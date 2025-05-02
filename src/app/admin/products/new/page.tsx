@@ -91,7 +91,11 @@ export default function AddBookPage() {
         });
 
       if (insertError) throw new Error(`Book insert failed: ${insertError.message}`);
-
+      await fetch('/api/revalidate', {
+        method: 'POST',
+  
+      })
+      
       router.push('/admin/products');
     } catch (err: any) {
       console.error(err);

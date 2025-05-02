@@ -3,7 +3,7 @@ import ProductList from "@/components/Productlist";
 import Sorting from "@/components/Sorting";
 import React from "react";
 
-export const dynamic = "force-static";
+export const revalidate = 0;
 
 interface PageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -58,7 +58,7 @@ async function Productpage({ searchParams }: PageProps) {
     const productsResponse = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/api/products?${query.toString()}`,
         {
-          next: { revalidate: 60 },
+          next: { tags: ['products'] },
         }
     );
 

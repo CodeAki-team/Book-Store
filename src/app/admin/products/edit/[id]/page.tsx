@@ -92,7 +92,10 @@ export default function EditProductPage() {
       if (updateError) {
         throw new Error('Update failed.');
       }
-
+      await fetch('/api/revalidate', {
+        method: 'POST',
+  
+      })
       router.push('/admin/products');
     } catch (err: any) {
       console.error(err);
